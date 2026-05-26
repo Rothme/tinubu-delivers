@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tinubu Delivers — A Citizens' Movement</title>
+<meta name="description" content="A grassroots citizens' movement tracking federal government delivery across Nigeria. Join the movement.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#008751;--dark-green:#005C2B;--gold:#C8952A;--gold-light:#E8B84B;
+  --dark:#0a1a0a;--off:#F7F5EF;--ink:#1a2e1a;--muted:#5a6e5a;
+  --white:#ffffff;--border:#dde8dd;
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--dark);color:var(--white);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+
+/* ── HERO ── */
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:60px 24px 80px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(0,135,81,.25) 0%,transparent 70%),radial-gradient(ellipse 60% 40% at 80% 100%,rgba(200,149,42,.12) 0%,transparent 60%);pointer-events:none}
+.hero::after{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(0,135,81,.04) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(0,135,81,.04) 40px);pointer-events:none}
+
+.flag-strip{display:flex;width:100%;height:5px;position:absolute;top:0;left:0}
+.flag-strip span{flex:1;background:var(--green)}
+.flag-strip span:nth-child(2){background:var(--white)}
+
+.hero-eyebrow{font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:24px;opacity:0;animation:fadeUp .8s .2s forwards}
+.hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(72px,18vw,160px);line-height:.92;letter-spacing:4px;color:var(--white);margin-bottom:12px;opacity:0;animation:fadeUp .8s .35s forwards}
+.hero-title span{color:var(--gold-light)}
+.hero-tagline{font-family:'Crimson Pro',serif;font-size:clamp(20px,4vw,28px);font-style:italic;color:rgba(255,255,255,.65);margin-bottom:40px;opacity:0;animation:fadeUp .8s .5s forwards}
+.hero-desc{max-width:560px;font-size:15px;line-height:1.8;color:rgba(255,255,255,.55);margin-bottom:52px;opacity:0;animation:fadeUp .8s .65s forwards}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;opacity:0;animation:fadeUp .8s .8s forwards}
+.btn-primary{padding:15px 32px;background:var(--green);color:#fff;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;letter-spacing:.05em;text-decoration:none;cursor:pointer;transition:all .2s}
+.btn-primary:hover{background:var(--dark-green);transform:translateY(-2px)}
+.btn-secondary{padding:15px 32px;background:transparent;color:rgba(255,255,255,.8);border:1.5px solid rgba(255,255,255,.2);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;letter-spacing:.05em;text-decoration:none;cursor:pointer;transition:all .2s}
+.btn-secondary:hover{border-color:var(--gold);color:var(--gold)}
+
+.scroll-hint{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;opacity:0;animation:fadeUp .8s 1.2s forwards}
+.scroll-hint span{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.3)}
+.scroll-arrow{width:1px;height:40px;background:linear-gradient(to bottom,rgba(255,255,255,.3),transparent);animation:scrollPulse 2s infinite}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+@keyframes scrollPulse{0%,100%{opacity:.3}50%{opacity:1}}
+
+/* ── MISSION ── */
+.section{padding:100px 24px;max-width:900px;margin:0 auto}
+.section-label{font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:16px}
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,8vw,72px);line-height:1;color:var(--white);margin-bottom:28px}
+.section-body{font-family:'Crimson Pro',serif;font-size:20px;line-height:1.85;color:rgba(255,255,255,.65)}
+.section-body strong{color:var(--white);font-weight:600}
+
+.mission-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:2px;margin:80px 0 0;background:rgba(255,255,255,.05)}
+.mission-card{background:var(--dark);padding:36px 28px}
+.mission-card:hover{background:rgba(0,135,81,.08)}
+.mc-num{font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--green);line-height:1;margin-bottom:12px}
+.mc-title{font-size:14px;font-weight:600;color:var(--white);margin-bottom:8px;letter-spacing:.03em}
+.mc-body{font-size:13px;color:rgba(255,255,255,.45);line-height:1.7}
+
+/* ── HOW IT WORKS ── */
+.how-section{background:rgba(255,255,255,.02);border-top:1px solid rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.06);padding:100px 24px}
+.how-inner{max-width:900px;margin:0 auto}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:40px;margin-top:60px}
+.step{position:relative;padding-left:24px;border-left:2px solid rgba(0,135,81,.3)}
+.step-num{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--green);line-height:1}
+.step-title{font-size:14px;font-weight:600;color:var(--white);margin:8px 0 6px}
+.step-body{font-size:13px;color:rgba(255,255,255,.45);line-height:1.7}
+
+/* ── WHO CAN JOIN ── */
+.groups-section{padding:100px 24px;max-width:900px;margin:0 auto}
+.groups-grid{display:flex;flex-wrap:wrap;gap:10px;margin-top:40px}
+.group-tag{padding:10px 20px;border:1px solid rgba(0,135,81,.3);border-radius:100px;font-size:13px;color:rgba(255,255,255,.6);transition:all .2s}
+.group-tag:hover{border-color:var(--green);color:var(--white);background:rgba(0,135,81,.1)}
+
+/* ── CTA SECTION ── */
+.cta-section{background:var(--green);padding:100px 24px;text-align:center;position:relative;overflow:hidden}
+.cta-section::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 100% at 50% 0%,rgba(255,255,255,.08),transparent)}
+.cta-section .section-label{color:rgba(255,255,255,.6)}
+.cta-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,10vw,96px);color:#fff;line-height:1;margin-bottom:20px}
+.cta-sub{font-family:'Crimson Pro',serif;font-size:20px;color:rgba(255,255,255,.75);margin-bottom:48px;font-style:italic}
+.btn-white{padding:16px 40px;background:#fff;color:var(--green);border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;letter-spacing:.03em;text-decoration:none;cursor:pointer;transition:all .2s;display:inline-block}
+.btn-white:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,.2)}
+
+/* ── DISCLAIMER ── */
+.disclaimer{background:rgba(0,0,0,.4);border-top:1px solid rgba(255,255,255,.06);padding:32px 24px;text-align:center}
+.disclaimer p{font-size:12px;color:rgba(255,255,255,.25);max-width:600px;margin:0 auto;line-height:1.7}
+.disclaimer strong{color:rgba(255,255,255,.4)}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;background:rgba(10,26,10,.85);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.06)}
+.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;color:#fff;text-decoration:none}
+.nav-logo span{color:var(--gold-light)}
+.nav-link{font-size:13px;font-weight:600;color:rgba(255,255,255,.6);text-decoration:none;letter-spacing:.05em;transition:color .2s}
+.nav-link:hover{color:#fff}
+.nav-cta{padding:8px 20px;background:var(--green);color:#fff;border-radius:6px;font-size:13px;font-weight:600;text-decoration:none;transition:background .2s}
+.nav-cta:hover{background:var(--dark-green)}
+.nav-links{display:flex;align-items:center;gap:24px}
+</style>
+</head>
+<body>
+
+<div class="flag-strip"><span></span><span></span><span></span></div>
+
+<nav>
+  <a class="nav-logo" href="/">Tinubu<span>Delivers</span></a>
+  <div class="nav-links">
+    <a class="nav-link" href="#mission">Mission</a>
+    <a class="nav-link" href="#how">How It Works</a>
+    <a class="nav-link" href="#join">Join</a>
+    <a class="nav-cta" href="/delivers">Explore Achievements →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <p class="hero-eyebrow">🇳🇬 A Citizens' Movement · Nigeria 2023–2027</p>
+  <h1 class="hero-title">TINUBU<br><span>DELIVERS</span></h1>
+  <p class="hero-tagline">Holding power accountable. Amplifying progress.</p>
+  <p class="hero-desc">We are an independent citizens' movement documenting, verifying, and amplifying the federal government's delivery record — sector by sector, state by state — across Nigeria.</p>
+  <div class="hero-btns">
+    <a class="btn-primary" href="#join">Join the Movement</a>
+    <a class="btn-secondary" href="/delivers">Explore Achievements</a>
+  </div>
+  <div class="scroll-hint">
+    <span>Scroll</span>
+    <div class="scroll-arrow"></div>
+  </div>
+</section>
+
+<!-- MISSION -->
+<section class="section" id="mission">
+  <p class="section-label">Our Mission</p>
+  <h2 class="section-title">WHY THIS MOVEMENT EXISTS</h2>
+  <p class="section-body">
+    In 2023, President Bola Ahmed Tinubu took office with bold promises and a <strong>Renewed Hope Agenda</strong>. Millions of Nigerians deserve to know — clearly, honestly, and accessibly — what has been delivered on those promises.<br><br>
+    Tinubu Delivers is not a government agency. We are <strong>citizens holding power accountable</strong>. We track real projects, real numbers, and real outcomes — then put that information directly in the hands of Nigerians through the most accessible technology available: a QR code.
+  </p>
+
+  <div class="mission-grid">
+    <div class="mission-card">
+      <div class="mc-num">01</div>
+      <div class="mc-title">Track & Verify</div>
+      <div class="mc-body">We monitor federal government delivery across 12 sectors and all 36 states, powered by live AI-assisted research.</div>
+    </div>
+    <div class="mission-card">
+      <div class="mc-num">02</div>
+      <div class="mc-title">Amplify</div>
+      <div class="mc-body">We equip approved supporter groups with unique QR codes to put information directly in the hands of Nigerians — on the streets, in markets, on campuses.</div>
+    </div>
+    <div class="mission-card">
+      <div class="mc-num">03</div>
+      <div class="mc-title">Measure</div>
+      <div class="mc-body">Every QR code scan is tracked. Every group's reach is measured. We know what works and where Nigerians are most engaged.</div>
+    </div>
+    <div class="mission-card">
+      <div class="mc-num">04</div>
+      <div class="mc-title">Mobilise</div>
+      <div class="mc-body">From student unions to market associations, we build a ground-level movement that connects citizens to the evidence of governance.</div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section" id="how">
+  <div class="how-inner">
+    <p class="section-label">How It Works</p>
+    <h2 class="section-title">THE QR CODE MOVEMENT</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-title">Apply to Join</div>
+        <div class="step-body">Your organisation registers on this platform. Tell us who you are, where you operate, and how you plan to deploy.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-title">Get Approved</div>
+        <div class="step-body">The Tinubu Delivers team reviews your application. Approved groups receive a unique QR code linked only to your organisation.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-title">Deploy</div>
+        <div class="step-body">Print your QR code on t-shirts, stickers, and fliers — or share digitally. Every scan is tracked to your group.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-title">Citizens Engage</div>
+        <div class="step-body">Anyone who scans lands on a live, AI-powered platform showing federal achievements by sector and by their state.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-title">We Measure Impact</div>
+        <div class="step-body">The movement team tracks which groups are driving the most engagement and provides support to the most active.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHO CAN JOIN -->
+<section class="groups-section" id="join">
+  <p class="section-label">Who Can Join</p>
+  <h2 class="section-title">THIS MOVEMENT IS FOR NIGERIANS</h2>
+  <p class="section-body" style="font-family:'DM Sans',sans-serif;font-size:15px">We welcome organised groups across all sectors of Nigerian society. Individual applications are not accepted — this is a movement of organisations.</p>
+  <div class="groups-grid">
+    <span class="group-tag">🎓 Student Unions & Bodies</span>
+    <span class="group-tag">⚒️ Trade Unions (NLC, TUC affiliates)</span>
+    <span class="group-tag">🏪 Market & Traders Associations</span>
+    <span class="group-tag">🕌 Religious Organisations</span>
+    <span class="group-tag">👩 Women's Groups</span>
+    <span class="group-tag">👨‍🌾 Farmers & Agric Cooperatives</span>
+    <span class="group-tag">🏘️ Community Development Associations</span>
+    <span class="group-tag">🚌 Transport Workers Unions</span>
+    <span class="group-tag">💼 Professional Associations</span>
+    <span class="group-tag">🏥 Health Workers Groups</span>
+    <span class="group-tag">📱 Youth & Tech Organisations</span>
+    <span class="group-tag">🎨 Creative & Cultural Groups</span>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <p class="section-label">Ready to Join?</p>
+  <h2 class="cta-title">JOIN THE<br>MOVEMENT</h2>
+  <p class="cta-sub">Apply for your organisation's unique QR code today.</p>
+  <a class="btn-white" href="/register">Apply for a QR Code →</a>
+</section>
+
+<!-- DISCLAIMER -->
+<div class="disclaimer">
+  <p><strong>Tinubu Delivers</strong> is an independent citizens' movement and is not an official organ of the Federal Government of Nigeria or any political party. QR codes are issued exclusively to approved organisations and may not be reproduced, redistributed, or modified without written permission from the Tinubu Delivers movement team. All content on the achievement platform is AI-assisted and independently verified.</p>
+</div>
+
+</body>
+</html>
