@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apply for a QR Code — Tinubu Delivers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--green:#008751;--dark-green:#005C2B;--gold:#C8952A;--dark:#0a1a0a;--off:#F7F5EF;--ink:#1a2e1a;--muted:#5a6e5a;--border:#dde8dd}
+body{font-family:'DM Sans',sans-serif;background:var(--off);color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased}
+nav{background:var(--dark);padding:16px 24px;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;color:#fff;text-decoration:none}
+.nav-logo span{color:#E8B84B}
+.nav-back{font-size:13px;color:rgba(255,255,255,.5);text-decoration:none;transition:color .2s}
+.nav-back:hover{color:#fff}
+.page-header{background:var(--dark);padding:60px 24px 70px;text-align:center;position:relative;overflow:hidden}
+.page-header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 100%,rgba(0,135,81,.2),transparent)}
+.page-header::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:48px;background:var(--off);clip-path:ellipse(55% 100% at 50% 100%)}
+.ph-label{font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
+.ph-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,10vw,72px);color:#fff;line-height:1}
+.ph-sub{font-size:14px;color:rgba(255,255,255,.5);margin-top:12px}
+.form-wrap{max-width:640px;margin:0 auto;padding:40px 24px 80px}
+.form-section{margin-bottom:32px}
+.form-section-title{font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--green);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.field{margin-bottom:18px}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;margin-bottom:6px}
+.field input,.field select,.field textarea{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--ink);background:#fff;transition:border-color .2s;-webkit-appearance:none}
+.field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23008751' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;background-color:#fff;padding-right:36px}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--green)}
+.field textarea{resize:vertical;min-height:80px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.check-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.check-item{display:flex;align-items:center;gap:10px;padding:11px 14px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;transition:all .2s;background:#fff}
+.check-item:hover{border-color:var(--green)}
+.check-item input[type=checkbox]{width:16px;height:16px;accent-color:var(--green);cursor:pointer;flex-shrink:0}
+.check-item span{font-size:13px;color:var(--ink)}
+.check-item.checked{border-color:var(--green);background:rgba(0,135,81,.05)}
+.other-field{margin-top:10px;display:none}
+.other-field.visible{display:block}
+.submit-area{text-align:center;margin-top:40px}
+.submit-btn{width:100%;padding:16px;background:var(--green);color:#fff;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;letter-spacing:.03em;cursor:pointer;transition:all .2s}
+.submit-btn:hover:not(:disabled){background:var(--dark-green)}
+.submit-btn:disabled{background:#9BC4A8;cursor:not-allowed}
+.form-note{font-size:12px;color:var(--muted);margin-top:12px;line-height:1.6}
+.success-screen{display:none;text-align:center;padding:60px 24px}
+.success-screen.visible{display:block}
+.success-icon{font-size:64px;margin-bottom:20px}
+.success-title{font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--green);margin-bottom:12px}
+.success-body{font-size:15px;color:var(--muted);line-height:1.7;max-width:400px;margin:0 auto 32px}
+.back-btn{display:inline-block;padding:13px 28px;background:var(--green);color:#fff;border-radius:8px;font-weight:600;font-size:14px;text-decoration:none}
+</style>
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="/">Tinubu<span>Delivers</span></a>
+  <a class="nav-back" href="/">← Back to Home</a>
+</nav>
+<div class="page-header">
+  <p class="ph-label">QR Code Application</p>
+  <h1 class="ph-title">JOIN THE<br>MOVEMENT</h1>
+  <p class="ph-sub">Complete the form below. Applications are reviewed within 48 hours.</p>
+</div>
+<div class="form-wrap">
+  <div class="success-screen" id="successScreen">
+    <div class="success-icon">🇳🇬</div>
+    <h2 class="success-title">Application Submitted!</h2>
+    <p class="success-body">Thank you. Your application has been received and will be reviewed by the Tinubu Delivers team within 48 hours. You will be contacted via the email address provided.</p>
+    <a class="back-btn" href="/">Back to Home</a>
+  </div>
+  <form id="regForm">
+    <div class="form-section">
+      <div class="form-section-title">Organisation Details</div>
+      <div class="field">
+        <label>Organisation Name *</label>
+        <input type="text" name="orgName" required placeholder="e.g. National Association of Nigerian Students (NANS)">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Organisation Type *</label>
+          <select name="orgType" required>
+            <option value="">Select type</option>
+            <option>Student Body / Union</option>
+            <option>Trade Union</option>
+            <option>Market / Traders Association</option>
+            <option>Religious Organisation</option>
+            <option>Women's Group</option>
+            <option>Farmers / Agric Cooperative</option>
+            <option>Community Development Association</option>
+            <option>Transport Workers Union</option>
+            <option>Professional Association</option>
+            <option>Health Workers Group</option>
+            <option>Youth / Tech Organisation</option>
+            <option>Creative / Cultural Group</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Estimated Membership Size *</label>
+          <select name="membershipSize" required>
+            <option value="">Select range</option>
+            <option>Under 500</option>
+            <option>500 – 2,000</option>
+            <option>2,000 – 10,000</option>
+            <option>10,000 – 50,000</option>
+            <option>Over 50,000</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>State *</label>
+          <select name="state" required>
+            <option value="">Select state</option>
+            <option>Abia</option><option>Adamawa</option><option>Akwa Ibom</option>
+            <option>Anambra</option><option>Bauchi</option><option>Bayelsa</option>
+            <option>Benue</option><option>Borno</option><option>Cross River</option>
+            <option>Delta</option><option>Ebonyi</option><option>Edo</option>
+            <option>Ekiti</option><option>Enugu</option><option>FCT Abuja</option>
+            <option>Gombe</option><option>Imo</option><option>Jigawa</option>
+            <option>Kaduna</option><option>Kano</option><option>Katsina</option>
+            <option>Kebbi</option><option>Kogi</option><option>Kwara</option>
+            <option>Lagos</option><option>Nasarawa</option><option>Niger</option>
+            <option>Ogun</option><option>Ondo</option><option>Osun</option>
+            <option>Oyo</option><option>Plateau</option><option>Rivers</option>
+            <option>Sokoto</option><option>Taraba</option><option>Yobe</option>
+            <option>Zamfara</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>LGA *</label>
+          <input type="text" name="lga" required placeholder="Local Government Area">
+        </div>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">Contact Person</div>
+      <div class="field">
+        <label>Full Name *</label>
+        <input type="text" name="contactName" required placeholder="Name of authorised representative">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Phone Number *</label>
+          <input type="tel" name="phone" required placeholder="08012345678">
+        </div>
+        <div class="field">
+          <label>Email Address *</label>
+          <input type="email" name="email" required placeholder="contact@organisation.org">
+        </div>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">Deployment Plan</div>
+      <div class="field">
+        <label>How will you deploy the QR Code? (Select all that apply) *</label>
+        <div class="check-grid" id="deployGrid">
+          <label class="check-item" id="chk-social">
+            <input type="checkbox" value="Social Media" onchange="toggleCheck(this,'chk-social')"> <span>📱 Social Media</span>
+          </label>
+          <label class="check-item" id="chk-tshirts">
+            <input type="checkbox" value="T-Shirts" onchange="toggleCheck(this,'chk-tshirts')"> <span>👕 T-Shirts</span>
+          </label>
+          <label class="check-item" id="chk-stickers">
+            <input type="checkbox" value="Stickers" onchange="toggleCheck(this,'chk-stickers')"> <span>🏷️ Stickers</span>
+          </label>
+          <label class="check-item" id="chk-fliers">
+            <input type="checkbox" value="Fliers" onchange="toggleCheck(this,'chk-fliers')"> <span>📄 Fliers</span>
+          </label>
+          <label class="check-item" id="chk-billboards">
+            <input type="checkbox" value="Billboards / Banners" onchange="toggleCheck(this,'chk-billboards')"> <span>🪧 Billboards / Banners</span>
+          </label>
+          <label class="check-item" id="chk-other">
+            <input type="checkbox" value="Other" onchange="toggleCheck(this,'chk-other');toggleOther(this)"> <span>➕ Other</span>
+          </label>
+        </div>
+        <div class="other-field" id="otherField">
+          <input type="text" name="otherDeployment" placeholder="Please describe how else you plan to deploy">
+        </div>
+      </div>
+      <div class="field">
+        <label>QR Code Format Required *</label>
+        <select name="qrType" required>
+          <option value="">Select format</option>
+          <option value="print">Print Quality (high-res PNG for stickers, shirts, fliers, billboards)</option>
+          <option value="digital">Digital (standard PNG for social media and screens)</option>
+          <option value="both">Both Print and Digital</option>
+        </select>
+      </div>
+    </div>
+    <div class="submit-area">
+      <button type="submit" class="submit-btn" id="submitBtn">Submit Application</button>
+      <p class="form-note">By submitting, you confirm that the information provided is accurate and that your organisation agrees to use the QR code only as approved by the Tinubu Delivers movement team. Misuse will result in revocation of access.</p>
+    </div>
+  </form>
+</div>
+<script>
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbwFhjugB7cfIECvPs5LEHT82EN_HhnV_wcsZgSAOxVINylaM4Xe62ZVHDq2zsUCiak/exec';
+function toggleCheck(cb, id) {
+  document.getElementById(id).classList.toggle('checked', cb.checked);
+}
+function toggleOther(cb) {
+  document.getElementById('otherField').classList.toggle('visible', cb.checked);
+}
+document.getElementById('regForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting…';
+  const fd = new FormData(this);
+  const methods = [];
+  document.querySelectorAll('#deployGrid input[type=checkbox]:checked').forEach(cb => {
+    methods.push(cb.value);
+  });
+  if (methods.length === 0) {
+    alert('Please select at least one deployment method.');
+    btn.disabled = false;
+    btn.textContent = 'Submit Application';
+    return;
+  }
+  const payload = {
+    orgName: fd.get('orgName'),
+    orgType: fd.get('orgType'),
+    state: fd.get('state'),
+    lga: fd.get('lga'),
+    contactName: fd.get('contactName'),
+    phone: fd.get('phone'),
+    email: fd.get('email'),
+    membershipSize: fd.get('membershipSize'),
+    deploymentMethods: methods.join(', '),
+    otherDeployment: fd.get('otherDeployment') || '',
+    qrType: fd.get('qrType')
+  };
+  try {
+    await fetch(SHEET_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload)
+    });
+    document.getElementById('regForm').style.display = 'none';
+    document.getElementById('successScreen').classList.add('visible');
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  } catch(err) {
+    alert('Submission failed. Please check your connection and try again.');
+    btn.disabled = false;
+    btn.textContent = 'Submit Application';
+  }
+});
+</script>
+</body>
+</html>
