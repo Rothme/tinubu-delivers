@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel — Tinubu Delivers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--green:#008751;--dark-green:#005C2B;--gold:#C8952A;--dark:#0a1a0a;--off:#F2F4F0;--ink:#1a2e1a;--muted:#5a6e5a;--border:#dde8dd;--red:#c0392b;--amber:#e67e22}
+body{font-family:'DM Sans',sans-serif;background:var(--off);color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased}
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--dark);padding:24px}
+.login-box{background:#111;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:48px 36px;width:100%;max-width:380px;text-align:center}
+.login-logo{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;color:#fff;margin-bottom:4px}
+.login-logo span{color:#E8B84B}
+.login-sub{font-size:12px;color:rgba(255,255,255,.3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:36px}
+.login-field{margin-bottom:14px;text-align:left}
+.login-field label{font-size:11px;color:rgba(255,255,255,.4);letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:6px}
+.login-field input{width:100%;padding:12px 14px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:14px}
+.login-field input:focus{outline:none;border-color:var(--green)}
+.login-btn{width:100%;padding:13px;background:var(--green);color:#fff;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-top:8px;transition:background .2s}
+.login-btn:hover{background:var(--dark-green)}
+.login-err{color:#e74c3c;font-size:12px;margin-top:10px}
+.admin-wrap{display:none}
+.admin-wrap.visible{display:block}
+header{background:var(--dark);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.h-logo{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;color:#fff;text-decoration:none}
+.h-logo span{color:#E8B84B}
+.h-right{display:flex;align-items:center;gap:16px}
+.h-tag{font-size:11px;color:rgba(255,255,255,.4);letter-spacing:.1em;text-transform:uppercase}
+.logout-btn{font-size:12px;color:rgba(255,255,255,.4);background:none;border:none;cursor:pointer;text-decoration:underline}
+.admin-body{padding:32px 24px;max-width:1200px;margin:0 auto}
+.stats-bar{display:flex;gap:16px;margin-bottom:28px;flex-wrap:wrap}
+.stat-card{background:#fff;border-radius:10px;padding:18px 22px;border:1px solid var(--border);flex:1;min-width:140px}
+.stat-num{font-family:'Bebas Neue',sans-serif;font-size:36px;line-height:1}
+.stat-lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
+.stat-card.green .stat-num{color:var(--green)}
+.stat-card.amber .stat-num{color:var(--amber)}
+.stat-card.red .stat-num{color:var(--red)}
+.filter-bar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:center}
+.filter-btn{padding:7px 16px;border-radius:100px;border:1.5px solid var(--border);background:#fff;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .2s}
+.filter-btn.active{background:var(--green);color:#fff;border-color:var(--green)}
+.reload-btn{margin-left:auto;padding:8px 18px;background:var(--green);color:#fff;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer}
+.table-wrap{background:#fff;border-radius:12px;border:1px solid var(--border);overflow:hidden}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#f8faf8;padding:12px 14px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border)}
+td{padding:14px 14px;border-bottom:1px solid var(--border);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#f8faf8}
+.td-org{font-weight:600;color:var(--ink)}
+.td-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.badge{display:inline-block;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:600}
+.badge-pending{background:#FEF3C7;color:#92400E}
+.badge-approved{background:#D1FAE5;color:#065F46}
+.badge-rejected{background:#FEE2E2;color:#991B1B}
+.action-btns{display:flex;gap:6px;flex-wrap:wrap}
+.action-btn{padding:6px 12px;border:none;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s}
+.btn-approve{background:var(--green);color:#fff}
+.btn-approve:hover{background:var(--dark-green)}
+.btn-reject{background:#FEE2E2;color:var(--red)}
+.btn-reject:hover{background:var(--red);color:#fff}
+.btn-qr{background:var(--gold);color:#fff}
+.btn-qr:hover{background:#a37420}
+.empty-state{text-align:center;padding:60px 24px;color:var(--muted)}
+.loading-state{text-align:center;padding:40px;color:var(--muted)}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:center;justify-content:center;padding:24px}
+.modal-overlay.visible{display:flex}
+.modal{background:#fff;border-radius:16px;padding:36px;width:100%;max-width:420px;text-align:center}
+.modal h3{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--ink);margin-bottom:4px}
+.modal-sub{font-size:13px;color:var(--muted);margin-bottom:24px}
+#qrCanvas{display:flex;justify-content:center;margin-bottom:20px}
+.modal-ref{font-size:11px;color:var(--muted);background:var(--off);padding:8px 14px;border-radius:6px;margin-bottom:20px;font-family:monospace}
+.modal-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.modal-dl{padding:11px 24px;background:var(--green);color:#fff;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer}
+.modal-close{padding:11px 24px;background:var(--off);color:var(--muted);border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer}
+</style>
+</head>
+<body>
+
+<div class="login-wrap" id="loginWrap">
+  <div class="login-box">
+    <div class="login-logo">Tinubu<span>Delivers</span></div>
+    <div class="login-sub">Admin Panel</div>
+    <div class="login-field">
+      <label>Username</label>
+      <input type="text" id="loginUser" placeholder="admin">
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="login-btn" onclick="doLogin()">Sign In</button>
+    <div class="login-err" id="loginErr"></div>
+  </div>
+</div>
+
+<div class="admin-wrap" id="adminWrap">
+  <header>
+    <a class="h-logo" href="/">Tinubu<span>Delivers</span></a>
+    <div class="h-right">
+      <span class="h-tag">Admin Panel</span>
+      <button class="logout-btn" onclick="logout()">Sign out</button>
+    </div>
+  </header>
+  <div class="admin-body">
+    <div class="stats-bar">
+      <div class="stat-card amber">
+        <div class="stat-num" id="statPending">—</div>
+        <div class="stat-lbl">Pending Review</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-num" id="statApproved">—</div>
+        <div class="stat-lbl">Approved</div>
+      </div>
+      <div class="stat-card red">
+        <div class="stat-num" id="statRejected">—</div>
+        <div class="stat-lbl">Rejected</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="statTotal">—</div>
+        <div class="stat-lbl">Total Applications</div>
+      </div>
+    </div>
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="filterApps('all',this)">All</button>
+      <button class="filter-btn" onclick="filterApps('Pending',this)">Pending</button>
+      <button class="filter-btn" onclick="filterApps('Approved',this)">Approved</button>
+      <button class="filter-btn" onclick="filterApps('Rejected',this)">Rejected</button>
+      <button class="reload-btn" onclick="loadData()">↻ Refresh</button>
+    </div>
+    <div class="table-wrap">
+      <div class="loading-state" id="loadingState">Loading applications…</div>
+      <table id="appTable" style="display:none">
+        <thead>
+          <tr>
+            <th>Organisation</th><th>Type</th><th>Location</th><th>Contact</th>
+            <th>Deployment</th><th>QR Format</th><th>Status</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="appBody"></tbody>
+      </table>
+      <div class="empty-state" id="emptyState" style="display:none">No applications found.</div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="qrModal">
+  <div class="modal">
+    <h3 id="qrOrgName">Organisation</h3>
+    <p class="modal-sub">Unique QR Code — approved deployment only</p>
+    <div id="qrCanvas"></div>
+    <div class="modal-ref" id="qrRefCode">ref: —</div>
+    <div class="modal-btns">
+      <button class="modal-dl" onclick="downloadQR()">Download PNG</button>
+      <button class="modal-close" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbwFhjugB7cfIECvPs5LEHT82EN_HhnV_wcsZgSAOxVINylaM4Xe62ZVHDq2zsUCiak/exec';
+const ADMIN_USER = 'tdadmin';
+const ADMIN_PASS = 'TinubuDelivers2027!';
+const BASE_URL   = 'https://tinubudelivers.com.ng/delivers';
+
+let allApps = [];
+let currentFilter = 'all';
+let currentQRRef = '';
+
+function doLogin() {
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  if (u === ADMIN_USER && p === ADMIN_PASS) {
+    sessionStorage.setItem('td_admin', '1');
+    document.getElementById('loginWrap').style.display = 'none';
+    document.getElementById('adminWrap').classList.add('visible');
+    loadData();
+  } else {
+    document.getElementById('loginErr').textContent = 'Invalid credentials.';
+  }
+}
+
+function logout() {
+  sessionStorage.removeItem('td_admin');
+  location.reload();
+}
+
+if (sessionStorage.getItem('td_admin')) {
+  document.getElementById('loginWrap').style.display = 'none';
+  document.getElementById('adminWrap').classList.add('visible');
+  loadData();
+}
+
+async function loadData() {
+  document.getElementById('loadingState').style.display = 'block';
+  document.getElementById('appTable').style.display = 'none';
+  document.getElementById('emptyState').style.display = 'none';
+  try {
+    const res = await fetch(SHEET_URL + '?ts=' + Date.now());
+    const json = await res.json();
+    const rows = json.data.slice(1);
+    allApps = rows.map((r, i) => ({
+      rowIndex: i + 2,
+      timestamp: r[0], orgName: r[1], orgType: r[2], state: r[3], lga: r[4],
+      contactName: r[5], phone: r[6], email: r[7], membershipSize: r[8],
+      deploymentMethods: r[9], otherDeployment: r[10],
+      status: r[11] || 'Pending', refCode: r[12] || '', qrType: r[13]
+    }));
+    updateStats();
+    renderTable(currentFilter);
+  } catch(e) {
+    document.getElementById('loadingState').textContent = 'Failed to load data. Check Google Sheets connection.';
+  }
+}
+
+function updateStats() {
+  document.getElementById('statPending').textContent  = allApps.filter(a => a.status === 'Pending').length;
+  document.getElementById('statApproved').textContent = allApps.filter(a => a.status === 'Approved').length;
+  document.getElementById('statRejected').textContent = allApps.filter(a => a.status === 'Rejected').length;
+  document.getElementById('statTotal').textContent    = allApps.length;
+}
+
+function filterApps(filter, btn) {
+  currentFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTable(filter);
+}
+
+function renderTable(filter) {
+  const filtered = filter === 'all' ? allApps : allApps.filter(a => a.status === filter);
+  document.getElementById('loadingState').style.display = 'none';
+  if (filtered.length === 0) {
+    document.getElementById('appTable').style.display = 'none';
+    document.getElementById('emptyState').style.display = 'block';
+    return;
+  }
+  document.getElementById('appTable').style.display = 'table';
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('appBody').innerHTML = filtered.map(a => `
+    <tr id="row-${a.rowIndex}">
+      <td><div class="td-org">${esc(a.orgName)}</div><div class="td-meta">${esc(a.membershipSize)} members</div></td>
+      <td>${esc(a.orgType)}</td>
+      <td><div>${esc(a.state)}</div><div class="td-meta">${esc(a.lga)}</div></td>
+      <td><div>${esc(a.contactName)}</div><div class="td-meta">${esc(a.phone)}</div><div class="td-meta">${esc(a.email)}</div></td>
+      <td style="max-width:160px;font-size:12px">${esc(a.deploymentMethods)}</td>
+      <td style="font-size:12px">${esc(a.qrType)}</td>
+      <td>
+        <span class="badge badge-${(a.status||'Pending').toLowerCase()}">${esc(a.status)}</span>
+        ${a.refCode ? `<div class="td-meta" style="margin-top:4px;font-family:monospace">${esc(a.refCode)}</div>` : ''}
+      </td>
+      <td>
+        <div class="action-btns">
+          ${a.status !== 'Approved' ? `<button class="action-btn btn-approve" onclick="updateStatus(${a.rowIndex},'Approved')">✓ Approve</button>` : ''}
+          ${a.status !== 'Rejected' ? `<button class="action-btn btn-reject" onclick="updateStatus(${a.rowIndex},'Rejected')">✗ Reject</button>` : ''}
+          ${a.status === 'Approved' ? `<button class="action-btn btn-qr" onclick="showQR('${esc(a.orgName)}','${esc(a.refCode)}')">QR Code</button>` : ''}
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+function esc(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+async function updateStatus(rowIndex, newStatus) {
+  const app = allApps.find(a => a.rowIndex === rowIndex);
+  if (!app) return;
+  let refCode = app.refCode;
+  if (newStatus === 'Approved' && !refCode) {
+    refCode = generateRef(app.orgName, app.state);
+  }
+  try {
+    await fetch(SHEET_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ action: 'updateStatus', rowIndex, status: newStatus, refCode })
+    });
+    app.status = newStatus;
+    app.refCode = refCode;
+    updateStats();
+    renderTable(currentFilter);
+    if (newStatus === 'Approved') setTimeout(() => showQR(app.orgName, refCode), 300);
+  } catch(e) {
+    alert('Update failed. Please try again.');
+  }
+}
+
+function generateRef(orgName, state) {
+  const slug = orgName.replace(/[^a-zA-Z0-9]/g,' ').trim().split(/\s+/)
+    .map(w => w[0]).join('').toUpperCase().substring(0,6);
+  const stateCode = (state||'NG').substring(0,3).toUpperCase();
+  const rand = Math.floor(1000 + Math.random() * 9000);
+  return `${slug}-${stateCode}-${rand}`;
+}
+
+function showQR(orgName, refCode) {
+  document.getElementById('qrOrgName').textContent = orgName;
+  document.getElementById('qrRefCode').textContent = 'ref: ' + refCode;
+  currentQRRef = refCode;
+  const canvas = document.getElementById('qrCanvas');
+  canvas.innerHTML = '';
+  new QRCode(canvas, {
+    text: BASE_URL + '?ref=' + encodeURIComponent(refCode),
+    width: 240, height: 240,
+    colorDark: '#008751', colorLight: '#ffffff',
+    correctLevel: QRCode.CorrectLevel.H
+  });
+  document.getElementById('qrModal').classList.add('visible');
+}
+
+function closeModal() { document.getElementById('qrModal').classList.remove('visible'); }
+
+function downloadQR() {
+  const canvas = document.querySelector('#qrCanvas canvas');
+  if (!canvas) { alert('QR not ready yet, try again.'); return; }
+  const link = document.createElement('a');
+  link.download = 'TinubuDelivers-QR-' + currentQRRef + '.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+document.getElementById('qrModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+</script>
+</body>
+</html>
