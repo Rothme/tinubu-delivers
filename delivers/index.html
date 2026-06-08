@@ -444,7 +444,7 @@ function buildTextSummary(d){
   return lines.join('\n');
 }
 async function captureCard(el){
-  return await html2canvas(el,{scale:2,useCORS:true,allowTaint:true,backgroundColor:'#ffffff',logging:false});
+  return await html2canvas(el,{scale:2,useCORS:true,allowTaint:true,backgroundColor:'#f3f6f0',logging:false,imageTimeout:0});
 }
 
 async function shareImg(platform,btn){
@@ -452,19 +452,14 @@ async function shareImg(platform,btn){
   try{
     var sectorName=document.getElementById('info-name').textContent;
     var shareText=buildTextSummary(currentData||{sector:sectorName,stats:[],achievements:[],comparison:[],progress:[]});
-    // Build share card silently off-screen
-    var container=document.createElement('div');
-    container.style.cssText='position:fixed;left:-9999px;top:0;width:380px;background:#fff;z-index:-1;';
-    container.innerHTML=buildSingleCard(currentData||{sector:sectorName,stats:[],achievements:[],other_achievements:[],comparison:[],progress:[],quote:'',source:''},currentSector);
-    document.body.appendChild(container);
-    // Animate progress bars
-    container.querySelectorAll('.sc-pf[data-w]').forEach(function(el){el.style.width=el.dataset.w+'%';});
-    // Small delay to ensure render
-    await new Promise(function(r){setTimeout(r,300);});
-    var cardEl=container.querySelector('.sc-wrap');
-    var canvas=await captureCard(cardEl);
-    document.body.removeChild(container);
+
+    // Capture the infographic card already rendered on screen
+    var card=document.getElementById('infographic-card');
+    card.style.padding='16px';
+    var canvas=await captureCard(card);
+    card.style.padding='';
     var dataUrl=canvas.toDataURL('image/png');
+
     if(platform==='download'){
       var a=document.createElement('a');
       a.href=dataUrl;
@@ -472,14 +467,16 @@ async function shareImg(platform,btn){
       a.click();
       btn.innerHTML='&#10003; Saved!'; setTimeout(function(){btn.innerHTML=orig;btn.disabled=false;},2000); return;
     }
-    // Try native share with image file
+
+    // Try native share with image file (works on mobile)
     var blob=await(await fetch(dataUrl)).blob();
     var file=new File([blob],'tinubu-delivers.png',{type:'image/png'});
     if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
       await navigator.share({title:'Tinubu Delivers — '+sectorName,text:shareText,files:[file]});
       btn.innerHTML=orig; btn.disabled=false; return;
     }
-    // Fallback: download image then open platform
+
+    // Desktop fallback: download image then open platform URL
     var a2=document.createElement('a'); a2.href=dataUrl; a2.download='tinubu-delivers.png'; a2.click();
     var enc=encodeURIComponent(shareText);
     var urls={
@@ -493,45 +490,8 @@ async function shareImg(platform,btn){
     btn.innerHTML=orig; btn.disabled=false;
   }catch(e){
     btn.innerHTML=orig; btn.disabled=false;
-    if(e.name!=='AbortError') alert('Could not share. Try Download PNG instead.');
+    if(e.name!=='AbortError') alert('Share failed: '+e.message+'. Try Download PNG.');
   }
-}
-async function captureCard(el){
-  return await html2canvas(el,{scale:2,useCORS:true,allowTaint:true,backgroundColor:'#ffffff',logging:false});
-}
-async function shareImg(platform,btn){
-  var orig=btn.innerHTML;btn.disabled=true;btn.innerHTML='&#9203;';
-  try{
-    var sectorName=document.getElementById('info-name').textContent;
-    var shareText=buildTextSummary(currentData||{sector:sectorName,stats:[],achievements:[],comparison:[],progress:[]});
-    if(platform==='download'){
-      var wrap=document.getElementById('sc-preview-wrap');
-      var els=wrap.querySelectorAll('.sc-wrap');
-      for(var i=0;i<els.length;i++){
-        var cv=await captureCard(els[i]);
-        var a=document.createElement('a');
-        a.href=cv.toDataURL('image/png');
-        a.download='tinubu-delivers-'+(sectorName||'achievement').replace(/\s+/g,'-').toLowerCase()+(els.length>1?'-'+(i+1):'')+'.png';
-        a.click();
-        await new Promise(function(r){setTimeout(r,250);});
-      }
-      btn.innerHTML='&#10003; Saved!';setTimeout(function(){btn.innerHTML=orig;btn.disabled=false;},2000);return;
-    }
-    var wrap2=document.getElementById('sc-preview-wrap');
-    var el2=wrap2.querySelector('.sc-wrap');
-    var dataUrl;
-    if(el2){var cv2=await captureCard(el2);dataUrl=cv2.toDataURL('image/png');}
-    if(dataUrl){
-      var blob=await(await fetch(dataUrl)).blob();
-      var file=new File([blob],'tinubu-delivers.png',{type:'image/png'});
-      if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({title:'Tinubu Delivers \u2014 '+sectorName,text:shareText,files:[file]});btn.innerHTML=orig;btn.disabled=false;return;}
-      var a2=document.createElement('a');a2.href=dataUrl;a2.download='tinubu-delivers.png';a2.click();
-    }
-    var enc=encodeURIComponent(shareText);
-    var urls={whatsapp:'https://wa.me/?text='+enc,twitter:'https://twitter.com/intent/tweet?text='+enc,instagram:'https://www.instagram.com/',facebook:'https://www.facebook.com/',telegram:'https://t.me/share/url?url=https://tinubudelivers.com.ng&text='+enc};
-    setTimeout(function(){if(urls[platform])window.open(urls[platform],'_blank');},600);
-    btn.innerHTML=orig;btn.disabled=false;
-  }catch(e){btn.innerHTML=orig;btn.disabled=false;if(e.name!=='AbortError')alert('Could not share. Try Download PNG instead.');}
 }
 
 function goBack(){showScreen('explore');}
