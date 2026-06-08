@@ -317,7 +317,7 @@ const SECTORS = [
   {id:'economy',name:'Economy & Finance',icon:'💰'},
   {id:'infra',name:'Infrastructure',icon:'🛣️'},
   {id:'education',name:'Education',icon:'🎓'},
-  {id:'security',name:'Security',icon:'🛡️'},
+  {id:'security',name:'Defence & Security',icon:'🛡️'},
   {id:'energy',name:'Power & Energy',icon:'⚡'},
   {id:'agriculture',name:'Agriculture',icon:'🌾'},
   {id:'health',name:'Health',icon:'🏥'},
@@ -379,7 +379,21 @@ CRITICAL ACCURACY RULES — violating any of these is unacceptable:
 Return ONLY valid JSON (no markdown, no backticks, no preamble) in this exact structure:
 {"sector":"${s.name}","headline":"Bold punchy 8-word headline summarising verified achievements","stats":[{"value":"X","label":"what it means — include year e.g. FY2024"},{"value":"X","label":"..."},{"value":"X","label":"..."},{"value":"X","label":"..."}],"achievements":[{"title":"Short title","detail":"One sentence with specific verified figures, project names, and year. Cite source in brackets e.g. [Budget Office 2024]."},{"title":"...","detail":"..."},{"title":"...","detail":"..."},{"title":"...","detail":"..."},{"title":"...","detail":"..."}],"other_achievements":[{"title":"Short title","detail":"One sentence with specific verified figures or project names and year."},{"title":"...","detail":"..."},{"title":"...","detail":"..."},{"title":"...","detail":"..."},{"title":"...","detail":"..."},{"title":"...","detail":"..."},{"title":"...","detail":"..."},{"title":"...","detail":"..."},{"title":"...","detail":"..."},{"title":"...","detail":"..."},{"title":"...","detail":"..."},{"title":"...","detail":"..."},{"title":"...","detail":"..."},{"title":"...","detail":"..."},{"title":"...","detail":"..."},{"title":"...","detail":"..."},{"title":"...","detail":"..."},{"title":"...","detail":"..."},{"title":"...","detail":"..."},{"title":"...","detail":"..."}],"progress":[{"label":"Initiative name — use actual implementation rates from official reports","percent":75},{"label":"...","percent":60},{"label":"...","percent":85}],"comparison":[{"item":"Measurable metric name (hard figures only — no qualitative metrics)","prev_term":"Avg per year 2019–2023 (verified figure)","curr_term":"Avg per year 2023–2026 (verified figure)","change":"+X% (must be positive — replace metric if negative)"},{"item":"...","prev_term":"...","curr_term":"...","change":"..."},{"item":"...","prev_term":"...","curr_term":"...","change":"..."},{"item":"...","prev_term":"...","curr_term":"...","change":"..."},{"item":"...","prev_term":"...","curr_term":"...","change":"..."}],"comparison_title":"Avg Annual Allocation: Buhari Era (2019–2023) vs Tinubu Era (2023–2026)","quote":"A verified policy statement or direct quote from the Tinubu administration on this sector — include source and date","source":"Ministry or Agency name, Year"}
 
-Rules: achievements=exactly 5, other_achievements=exactly 20 named programmes or projects with specific verified figures, comparison=exactly 5 rows comparing single-year or clearly-labelled Buhari-era vs Tinubu-era figures for this sector. Use real project names only. If a figure cannot be verified, say so explicitly rather than inventing one. Tone: confident, factual, and defensible.`;
+Rules: achievements=exactly 5, other_achievements=exactly 20 named programmes or projects with specific verified figures, comparison=exactly 5 rows comparing single-year or clearly-labelled Buhari-era vs Tinubu-era figures for this sector. Use real project names only. If a figure cannot be verified, say so explicitly rather than inventing one. Tone: confident, factual, and defensible.
+
+SPECIAL INSTRUCTION — APPLIES ONLY WHEN sector is "Defence & Security":
+Focus exclusively on Nigeria's military, armed forces modernisation, and national security architecture. Key areas:
+- Defence budget: FY2024=₦2.34tn approved, FY2025=₦4.06tn approved, FY2026=₦5.41tn approved (9.3% of total budget — highest defence allocation in Nigerian history). Use these verified figures only.
+- Armed Forces procurement: named vessels commissioned (NNS), aircraft acquired (Super Tucano jets, helicopters, drones), armoured vehicles, equipment
+- Counter-insurgency: Operation Hadin Kai outcomes — territories recovered, ISWAP/Boko Haram commanders neutralised, camps destroyed, IDPs returned (cite DHQ releases)
+- Naval expansion: NNS platforms, maritime domain awareness, Gulf of Guinea security
+- Air Force: NAF strikes, ISR platforms, air assets commissioned
+- Army: battalion deployments, Forward Operating Bases established, barracks upgrades
+- Troops welfare: salary increases, Group Life Insurance scheme, housing
+- Cybersecurity and signals intelligence infrastructure
+- Border security and maritime interdictions
+- Joint operations outcomes with verifiable metrics
+Do NOT include police metrics, civilian law enforcement, or generic crime statistics — those belong to a separate Interior/Police sector. Stick to military and strategic defence.`;
   try{
     const res=await fetch(PROXY,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:2500,messages:[{role:'user',content:prompt}]})});
     const data=await res.json();
