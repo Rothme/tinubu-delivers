@@ -297,12 +297,17 @@ async function startGenerate(){
   cachedPng=null;showScreen('loading');
   const prompt=`You are producing factual content for an official Nigerian presidential campaign platform called "Tinubu Delivers". Generate achievement data for President Bola Ahmed Tinubu's administration (2023–2027) in the sector: "${s.name}".\n\nReturn ONLY valid JSON (no markdown, no backticks, no preamble) in this exact structure:\n{"sector":"${s.name}","headline":"Bold punchy 8-word headline summarising achievements","stats":[{"value":"X","label":"what it means"},{"value":"X","label":"..."},{"value":"X","label":"..."},{"value":"X","label":"..."}],"achievements":[{"title":"Short title","detail":"One sentence with specific figures or project names."},{"title":"...","detail":"..."},{"title":"...","detail":"..."},{"title":"...","detail":"..."},{"title":"...","detail":"..."}],"progress":[{"label":"Initiative name","percent":75},{"label":"...","percent":60},{"label":"...","percent":85}],"quote":"A policy statement or quote from the Tinubu administration on this sector","source":"Ministry or Agency name, Year"}\n\nUse real project names, named programmes, and verified public figures. Tone: confident and factual.`;
   try{
-    const res=await fetch(PROXY,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:2500,messages:[{role:'user',content:prompt}]})});
+    const res=await fetch(PROXY,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:4000,messages:[{role:'user',content:prompt}]})});
     const data=await res.json();
     const txt=data.content.map(i=>i.text||'').join('');
     const parsed=JSON.parse(txt.replace(/```json|```/g,'').trim());
     renderInfo(parsed,s);
-  }catch(e){showScreen('explore');alert('Could not load data. Please check your connection and try again.');}
+  }catch(e){
+    // Try to salvage partial JSON before showing error
+    console.error('API error:',e);
+    showScreen('explore');
+    alert('Could not load data for this selection. Please try again or choose a different sector/state.');
+  }
 }
 function renderInfo(d,s){
   document.getElementById('info-icon').textContent=s.icon;
@@ -365,12 +370,17 @@ async function startStateGenerate(){
   cachedPng=null;showScreen('loading');
   const prompt=`You are producing factual content for a Nigerian presidential campaign platform called "Tinubu Delivers". Generate achievement data for President Bola Ahmed Tinubu's administration (2023–2027) specifically in ${state} State, Nigeria.\n\nReturn ONLY valid JSON (no markdown, no backticks, no preamble) in this exact structure:\n{"sector":"${state} State","headline":"Bold 8-word headline on federal projects in ${state}","stats":[{"value":"X","label":"what it means"},{"value":"X","label":"..."},{"value":"X","label":"..."},{"value":"X","label":"..."}],"achievements":[{"title":"Short title","detail":"One sentence with specific project names, amounts or milestones in ${state}."},{"title":"...","detail":"..."},{"title":"...","detail":"..."},{"title":"...","detail":"..."},{"title":"...","detail":"..."}],"progress":[{"label":"Infrastructure","percent":70},{"label":"Economy & Jobs","percent":65},{"label":"Social Investment","percent":75}],"quote":"A policy statement from the Tinubu administration relevant to ${state} or its geopolitical zone","source":"Relevant Federal Ministry, Year"}\n\nFocus on: federal roads, rail, healthcare centres, student loan beneficiaries, FAAC disbursements, CNG buses, power projects, agric support, and any named projects in ${state}. Use real project names where known. Tone: confident and factual.`;
   try{
-    const res=await fetch(PROXY,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:2500,messages:[{role:'user',content:prompt}]})});
+    const res=await fetch(PROXY,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:4000,messages:[{role:'user',content:prompt}]})});
     const data=await res.json();
     const txt=data.content.map(i=>i.text||'').join('');
     const parsed=JSON.parse(txt.replace(/```json|```/g,'').trim());
     renderInfo(parsed,{icon:'🗺️',name:state+' State'});
-  }catch(e){showScreen('explore');alert('Could not load data. Please check your connection and try again.');}
+  }catch(e){
+    // Try to salvage partial JSON before showing error
+    console.error('API error:',e);
+    showScreen('explore');
+    alert('Could not load data for this selection. Please try again or choose a different sector/state.');
+  }
 }
 </script>
 </body>
