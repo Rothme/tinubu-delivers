@@ -1,9 +1,9 @@
 // ── Tinubu Delivers — Cloudflare Pages Function with KV Caching ──────────────
-// Cache TTL: 24 hours (86400 seconds)
+// Cache: PERMANENT — no expiry. Content served indefinitely until manual refresh.
 // KV namespace binding name: TD_CACHE (set in Cloudflare dashboard)
 // This reduces API calls from 1-per-user to 1-per-sector/state-per-day
 
-const CACHE_TTL = 86400; // 24 hours in seconds
+// Cache is permanent — no TTL. Refresh manually via /seed when needed.
 
 export async function onRequestPost(context) {
   const apiKey = context.env.ANTHROPIC_API_KEY;
@@ -82,7 +82,7 @@ export async function onRequestPost(context) {
   // ── STORE IN CACHE IF SUCCESSFUL ───────────────────────────────────────────
   if (kv && cacheKey && response.status === 200 && data.content) {
     try {
-      await kv.put(cacheKey, responseText, {expirationTtl: CACHE_TTL});
+      await kv.put(cacheKey, responseText); // No TTL — permanent until manually refreshed
     } catch(e) {
       console.error('KV write error:', e);
     }
