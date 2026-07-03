@@ -7,7 +7,7 @@ const CACHE_TTL = 86400; // 24 hours in seconds
 
 export async function onRequestPost(context) {
   const apiKey = context.env.ANTHROPIC_API_KEY;
-  const kv     = context.env.KV_BINDING; // KV namespace binding
+  const kv     = context.env.TD_CACHE; // KV namespace binding
 
   if (!apiKey) {
     return new Response(JSON.stringify({error:'API key not configured'}), {
