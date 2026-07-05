@@ -1,16 +1,12 @@
-// functions/seed.js
-// ONE-TIME USE. Deploy this file, hit GET /seed?key=YOUR_SEED_KEY once, confirm the response,
-// then DELETE this file and redeploy — same working rule you already use.
+// functions/seed.js — CORRECTED VERSION
+// Deploy, hit GET /seed?key=YOUR_SEED_KEY once, confirm the response, then delete this file.
 //
-// It does not generate or alter any content. It writes the 49 pre-built, source-checked
-// entries from seed-payload.json verbatim into TD_CACHE, keyed by cacheKey, with no TTL
-// (matches your existing permanent-cache pattern).
-//
-// SEED_KEY is a Cloudflare Pages environment variable/secret you set yourself (Pages
-// dashboard -> Settings -> Environment variables). This just stops the endpoint from being
-// triggered by a stray visitor or crawler while it's live. Set it to any random string.
+// Writes 49 entries into TD_CACHE using the EXACT key format your existing claude.js expects
+// (including the "&" in sector keys like "sector:economy-&-finance", and "state:fct-abuja"
+// rather than "state:fct"). Each value is shaped exactly like a real Anthropic API response
+// so your existing, unmodified render code in index.html reads it with zero changes.
 
-import ALL_ENTRIES from "./seed-payload.json";
+import ALL_ENTRIES from "./seed-payload-v2.json";
 
 export async function onRequestGet(context) {
   const { request, env } = context;
@@ -27,7 +23,7 @@ export async function onRequestGet(context) {
   const results = [];
   for (const [cacheKey, entry] of Object.entries(ALL_ENTRIES)) {
     try {
-      await env.TD_CACHE.put(cacheKey, JSON.stringify(entry)); // no expirationTtl = permanent
+      await env.TD_CACHE.put(cacheKey, JSON.stringify(entry)); // no TTL = permanent
       results.push({ key: cacheKey, status: "ok" });
     } catch (err) {
       results.push({ key: cacheKey, status: "error", message: String(err) });
@@ -35,13 +31,10 @@ export async function onRequestGet(context) {
   }
 
   const failed = results.filter(r => r.status !== "ok");
-
   return new Response(JSON.stringify({
     seeded: results.length,
     failed: failed.length,
     failures: failed,
-    reminder: "Delete this file and redeploy now that seeding is confirmed.",
-  }, null, 2), {
-    headers: { "content-type": "application/json" },
-  });
+    reminder: "Delete functions/seed.js and functions/seed-payload-v2.json now, then commit and push.",
+  }, null, 2), { headers: { "content-type": "application/json" } });
 }

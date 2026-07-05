@@ -65,35 +65,36 @@ export async function onRequestPost(context) {
     }
   }
 
-  // ── CALL ANTHROPIC API ─────────────────────────────────────────────────────
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
-    method:'POST',
-    headers:{
-      'Content-Type':'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version':'2023-06-01'
-    },
-    body: JSON.stringify(body)
-  });
-
-  const data = await response.json();
-  const responseText = JSON.stringify(data);
-
-  // ── STORE IN CACHE IF SUCCESSFUL ───────────────────────────────────────────
-  if (kv && cacheKey && response.status === 200 && data.content) {
-    try {
-      await kv.put(cacheKey, responseText); // No TTL — permanent until manually refreshed
-    } catch(e) {
-      console.error('KV write error:', e);
-    }
-  }
+  // ── NO LIVE GENERATION — verified-content only ─────────────────────────────
+  // This platform now serves ONLY pre-verified, source-checked content from TD_CACHE.
+  // (Previously this block called the Anthropic API with a prompt that instructed
+  // "ALL content must be POSITIVE" and to never show declines — that generated
+  // unverified, one-sided content on every cache miss. Removed entirely.)
+  // If a key isn't cached, return an honest "not yet available" card instead.
+  const fallback = {
+    content: [{
+      type: 'text',
+      text: JSON.stringify({
+        sector: cacheKey ? cacheKey.split(':')[1].replace(/-/g,' ') : 'this selection',
+        headline: 'Verified data not yet available for this selection',
+        stats: [],
+        achievements: [],
+        other_achievements: [],
+        progress: [],
+        comparison: [],
+        quote: 'This selection has not yet been added to the verified dataset. Check back soon.',
+        source: 'Capitaro PoliTech Verification Desk'
+      })
+    }]
+  };
+  const responseText = JSON.stringify(fallback);
 
   return new Response(responseText, {
-    status: response.status,
+    status: 200,
     headers:{
       'Content-Type':'application/json',
       'Access-Control-Allow-Origin':'*',
-      'X-Cache':'MISS',
+      'X-Cache':'MISS-NOGEN',
       'X-Cache-Key': cacheKey || 'none'
     }
   });
