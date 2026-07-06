@@ -85,6 +85,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--light);color:var(--text);
 .achiev-num{width:22px;height:22px;border-radius:50%;background:var(--green);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
 .achiev-text{font-size:12px;color:var(--text);line-height:1.55}
 .achiev-text strong{color:var(--green);font-weight:600}
+.achiev-bullets{margin:5px 0 0 0;padding-left:16px;list-style:disc}
+.achiev-bullets li{margin-bottom:3px}
+.achiev-bullets li:last-child{margin-bottom:0}
 .progress-section{margin-bottom:20px}
 .prog-item{margin-bottom:11px}
 .prog-row{display:flex;justify-content:space-between;font-size:12px;font-weight:500;color:var(--text);margin-bottom:4px}
@@ -131,6 +134,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--light);color:var(--text);
 .other-dot{width:7px;height:7px;border-radius:50%;background:var(--gold);flex-shrink:0;margin-top:4px}
 .other-text{font-size:12px;color:var(--text);line-height:1.55}
 .other-text strong{color:#9a6e00;font-weight:600}
+.other-text .achiev-bullets{margin:5px 0 0 0;padding-left:16px;list-style:disc}
+.other-text .achiev-bullets li{margin-bottom:3px}
 .compare-wrap{margin-bottom:20px;border-radius:12px;overflow:hidden;border:1px solid var(--border)}
 .compare-head-row{background:var(--dark);padding:9px 12px}
 .compare-head-row p{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#E8B84B}
@@ -336,9 +341,10 @@ function renderInfo(d,s){
   document.getElementById('info-name').textContent=d.sector;
   document.getElementById('info-tagline').textContent=d.headline;
   const statsHTML=d.stats.map(st=>`<div class="stat-box"><div class="stat-val">${st.value}</div><div class="stat-lbl">${st.label}</div></div>`).join('');
-  const achievHTML=d.achievements.map((a,i)=>`<div class="achiev-item"><div class="achiev-num">${i+1}</div><div class="achiev-text"><strong>${a.title}:</strong> ${a.detail}</div></div>`).join('');
+  const bulletsHTML=(bullets)=>`<ul class="achiev-bullets">${(bullets||[]).map(b=>`<li>${b}</li>`).join('')}</ul>`;
+  const achievHTML=d.achievements.map((a,i)=>`<div class="achiev-item"><div class="achiev-num">${i+1}</div><div class="achiev-text"><strong>${a.title}</strong>${bulletsHTML(a.bullets)}</div></div>`).join('');
   const progHTML=d.progress.map(p=>`<div class="prog-item"><div class="prog-row"><span>${p.label}</span><span class="prog-pct">${p.percent}%</span></div><div class="prog-track"><div class="prog-fill" data-w="${p.percent}"></div></div></div>`).join('');
-  const otherHTML=(d.other_achievements||[]).map(a=>`<div class='other-item'><div class='other-dot'></div><div class='other-text'><strong>${a.title}:</strong> ${a.detail}</div></div>`).join('');
+  const otherHTML=(d.other_achievements||[]).map(a=>`<div class='other-item'><div class='other-dot'></div><div class='other-text'><strong>${a.title}</strong>${bulletsHTML(a.bullets)}</div></div>`).join('');
   const compRows=(d.comparison||[]).map(r=>{const up=r.change&&r.change.startsWith('+');const badge=r.change?`<span class='${up?"chg-up":"chg-dn"}'>${r.change}</span>`:'';return `<tr><td>${r.item}</td><td>${r.prev_term||''}</td><td>${r.curr_term||''}</td><td>${badge}</td></tr>`;}).join('');
   const compTitle=d.comparison_title||'';
   const compareHTML=d.comparison&&d.comparison.length?`<div class='compare-wrap'><div class='compare-head-row'><p>${compTitle}</p></div><table class='compare-tbl'><thead><tr><th>Metric</th><th>May 2019–May 2023</th><th>May 2023–Till Date</th><th>Change</th></tr></thead><tbody>${compRows}</tbody></table></div>`:'';
