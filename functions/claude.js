@@ -83,7 +83,7 @@ export async function onRequestPost(context) {
         progress: [],
         comparison: [],
         quote: 'This selection has not yet been added to the verified dataset. Check back soon.',
-        source: 'Capitaro PoliTech Verification Desk'
+        source: 'Tinubu Delivers'
       })
     }]
   };
