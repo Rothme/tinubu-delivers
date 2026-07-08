@@ -2,22 +2,34 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Tinubu Delivers — Client Insights</title>
 <meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0a2118">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TD Insights">
+<link rel="manifest" href="/client-insights/manifest.json">
+<link rel="apple-touch-icon" href="/client-insights/icon-192.png">
+<link rel="icon" href="/client-insights/icon-192.png">
 <style>
-  body{margin:0;font-family:Arial,sans-serif;background:#f4f5f3;}
-  header{background:#0a2118;padding:18px 32px;display:flex;justify-content:space-between;align-items:center;}
-  header .logo{color:#fff;font-weight:700;font-size:18px;}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:#f4f5f3;padding-bottom:env(safe-area-inset-bottom);}
+  header{background:#0a2118;padding:calc(14px + env(safe-area-inset-top)) 20px 14px 20px;position:sticky;top:0;z-index:10;}
+  header .logo{color:#fff;font-weight:700;font-size:17px;}
   header .logo span{color:#e0a92e;}
-  header .tag{color:#9fb8ac;font-size:12px;letter-spacing:1px;text-transform:uppercase;}
-  main{max-width:960px;margin:32px auto;padding:0 20px;}
-  h2{font-size:16px;color:#333;margin:32px 0 12px 0;}
-  table{width:100%;border-collapse:collapse;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.08);}
-  th,td{text-align:left;padding:12px 16px;font-size:14px;border-bottom:1px solid #eee;}
-  th{background:#f0f0f0;color:#555;text-transform:uppercase;font-size:11px;letter-spacing:0.5px;}
-  tr:last-child td{border-bottom:none;}
-  .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;background:#e9f5ef;color:#0d5c3a;}
-  .note{font-size:12px;color:#999;margin-top:20px;}
+  header .tag{color:#9fb8ac;font-size:11px;letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
+  main{max-width:520px;margin:0 auto;padding:16px;}
+  h2{font-size:14px;color:#555;margin:24px 4px 10px 4px;text-transform:uppercase;letter-spacing:0.5px;}
+  .card{background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,0.06);display:flex;justify-content:space-between;align-items:center;}
+  .card .left .badge{display:inline-block;padding:3px 9px;border-radius:8px;font-size:12px;background:#e9f5ef;color:#0d5c3a;font-weight:600;margin-bottom:4px;}
+  .card .left .dates{font-size:11px;color:#999;}
+  .card .right{font-size:22px;font-weight:700;color:#0d2b1f;text-align:right;}
+  .empty{text-align:center;color:#999;padding:30px 10px;font-size:14px;}
+  .note{font-size:11px;color:#999;margin:20px 4px;text-align:center;}
+  .pull-refresh{text-align:center;padding:8px;}
+  .pull-refresh button{background:none;border:none;color:#0d5c3a;font-size:13px;font-weight:600;padding:8px 16px;}
 </style>
 </head>
 <body>
@@ -29,41 +41,42 @@
   <div id="qr-usage-banner"></div>
 
   <h2>Usage by QR code</h2>
-  <table id="tagTable">
-    <thead>
-      <tr><th>Label</th><th>Scans</th><th>First scan</th><th>Last scan</th></tr>
-    </thead>
-    <tbody id="tagTableBody">
-      <tr><td colspan="4" style="text-align:center;color:#999;">Loading...</td></tr>
-    </tbody>
-  </table>
-  <p class="note">This view is read-only. Figures update automatically every minute and reflect all-time totals since tracking began.</p>
+  <div id="tagCards">
+    <div class="empty">Loading...</div>
+  </div>
+  <div class="pull-refresh"><button onclick="loadTable()">↻ Refresh now</button></div>
+  <p class="note">Read-only view. Figures refresh automatically every minute and reflect all-time totals since tracking began.</p>
 </main>
 <script src="/qr-banner.js"></script>
 <script>
 async function loadTable(){
+  const el = document.getElementById('tagCards');
   try {
     const res = await fetch('/qr-stats');
     const data = await res.json();
-    const tbody = document.getElementById('tagTableBody');
     if (!data.tags || data.tags.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#999;">No QR scans recorded yet.</td></tr>';
+      el.innerHTML = '<div class="empty">No QR scans recorded yet.</div>';
       return;
     }
-    tbody.innerHTML = data.tags.map(t => `
-      <tr>
-        <td><span class="badge">${t.tag}</span></td>
-        <td>${t.count.toLocaleString()}</td>
-        <td>${new Date(t.firstSeen).toLocaleDateString()}</td>
-        <td>${new Date(t.lastSeen).toLocaleDateString()}</td>
-      </tr>
+    el.innerHTML = data.tags.map(t => `
+      <div class="card">
+        <div class="left">
+          <div class="badge">${t.tag}</div>
+          <div class="dates">First: ${new Date(t.firstSeen).toLocaleDateString()} · Last: ${new Date(t.lastSeen).toLocaleDateString()}</div>
+        </div>
+        <div class="right">${t.count.toLocaleString()}</div>
+      </div>
     `).join('');
   } catch(e) {
-    document.getElementById('tagTableBody').innerHTML = '<tr><td colspan="4" style="text-align:center;color:#b00020;">Could not load data.</td></tr>';
+    el.innerHTML = '<div class="empty" style="color:#b00020;">Could not load data.</div>';
   }
 }
 loadTable();
 setInterval(loadTable, 60000);
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/client-insights/service-worker.js').catch(()=>{});
+}
 </script>
 </body>
 </html>
