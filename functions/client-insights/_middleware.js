@@ -16,6 +16,7 @@ export async function onRequest(context) {
     "/client-insights/service-worker.js",
     "/client-insights/icon-192.png",
     "/client-insights/icon-512.png",
+    "/client-insights/login-bg-source.jpg",
   ];
   if (publicPaths.includes(url.pathname)) {
     return next();

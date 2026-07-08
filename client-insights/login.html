@@ -13,20 +13,30 @@
 <link rel="apple-touch-icon" href="/client-insights/icon-192.png">
 <link rel="icon" href="/client-insights/icon-192.png">
 <style>
-  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:#0d2b1f;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;}
-  .box{background:#fff;border-radius:16px;padding:36px 28px;width:100%;max-width:340px;box-shadow:0 10px 40px rgba(0,0,0,0.3);}
-  h1{font-size:20px;margin:0 0 4px 0;color:#0d2b1f;}
-  p{font-size:13px;color:#777;margin:0 0 22px 0;}
+  body{
+    margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+    min-height:100vh;padding:20px;
+    display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(180deg, rgba(10,33,24,0.55) 0%, rgba(10,33,24,0.92) 75%, #0a2118 100%), url('/client-insights/login-bg-source.jpg');
+    background-size:cover;background-position:top center;background-repeat:no-repeat;
+  }
+  .box{background:rgba(255,255,255,0.97);border-radius:16px;padding:32px 26px;width:100%;max-width:340px;box-shadow:0 10px 40px rgba(0,0,0,0.4);backdrop-filter:blur(4px);}
+  .brand{text-align:center;margin-bottom:18px;}
+  .brand .name{font-weight:700;font-size:16px;color:#0d2b1f;}
+  .brand .name span{color:#b8860b;}
+  h1{font-size:19px;margin:0 0 4px 0;color:#0d2b1f;text-align:center;}
+  p{font-size:13px;color:#777;margin:0 0 20px 0;text-align:center;}
   input{width:100%;padding:13px 14px;border:1px solid #ccc;border-radius:10px;font-size:16px;box-sizing:border-box;margin-bottom:14px;}
   button{width:100%;padding:14px;border:none;border-radius:10px;background:#0d5c3a;color:#fff;font-size:16px;font-weight:600;cursor:pointer;}
   button:active{background:#0a4a2f;}
-  .err{color:#b00020;font-size:13px;margin-top:10px;display:none;}
+  .err{color:#b00020;font-size:13px;margin-top:10px;display:none;text-align:center;}
 </style>
 </head>
 <body>
 <div class="box">
+  <div class="brand"><span class="name">TINUBU <span>DELIVERS</span></span></div>
   <h1>Client Insights</h1>
-  <p>Read-only usage dashboard — Tinubu Delivers</p>
+  <p>Read-only usage dashboard</p>
   <input type="password" id="pw" placeholder="Password" autofocus>
   <button onclick="doLogin()">Sign in</button>
   <div class="err" id="err">Incorrect password.</div>
@@ -42,8 +52,13 @@ async function doLogin(){
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({password: pw})
     });
+    const data = await res.json();
     if (res.ok) {
-      window.location.href = '/client-insights/';
+      if (data.mustSetNewPassword) {
+        window.location.href = '/client-insights/?force_reset=1';
+      } else {
+        window.location.href = '/client-insights/';
+      }
     } else {
       err.style.display = 'block';
     }

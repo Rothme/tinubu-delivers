@@ -16,10 +16,11 @@
 <style>
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:#f4f5f3;padding-bottom:env(safe-area-inset-bottom);}
-  header{background:#0a2118;padding:calc(14px + env(safe-area-inset-top)) 20px 14px 20px;position:sticky;top:0;z-index:10;}
+  header{background:#0a2118;padding:calc(14px + env(safe-area-inset-top)) 20px 14px 20px;position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:flex-start;}
   header .logo{color:#fff;font-weight:700;font-size:17px;}
   header .logo span{color:#e0a92e;}
   header .tag{color:#9fb8ac;font-size:11px;letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
+  header .menu-btn{background:none;border:1px solid #2a4a3a;color:#cfe0d7;border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;}
   main{max-width:520px;margin:0 auto;padding:16px;}
   h2{font-size:14px;color:#555;margin:24px 4px 10px 4px;text-transform:uppercase;letter-spacing:0.5px;}
   .card{background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,0.06);display:flex;justify-content:space-between;align-items:center;}
@@ -30,12 +31,28 @@
   .note{font-size:11px;color:#999;margin:20px 4px;text-align:center;}
   .pull-refresh{text-align:center;padding:8px;}
   .pull-refresh button{background:none;border:none;color:#0d5c3a;font-size:13px;font-weight:600;padding:8px 16px;}
+
+  /* Settings panel */
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:100;padding:20px;}
+  .overlay.show{display:flex;}
+  .panel{background:#fff;border-radius:16px;padding:26px 22px;width:100%;max-width:340px;}
+  .panel h3{margin:0 0 4px 0;font-size:17px;color:#0d2b1f;}
+  .panel p{margin:0 0 18px 0;font-size:13px;color:#777;}
+  .panel input{width:100%;padding:12px 13px;border:1px solid #ccc;border-radius:9px;font-size:15px;box-sizing:border-box;margin-bottom:12px;}
+  .panel button.primary{width:100%;padding:13px;border:none;border-radius:9px;background:#0d5c3a;color:#fff;font-size:15px;font-weight:600;margin-bottom:8px;}
+  .panel button.secondary{width:100%;padding:12px;border:none;background:none;color:#888;font-size:14px;}
+  .panel .msg{font-size:13px;text-align:center;margin-top:8px;display:none;}
+  .panel .msg.ok{color:#0d5c3a;}
+  .panel .msg.err{color:#b00020;}
 </style>
 </head>
 <body>
 <header>
-  <div class="logo">TINUBU <span>DELIVERS</span></div>
-  <div class="tag">Client Insights &middot; Read-Only</div>
+  <div>
+    <div class="logo">TINUBU <span>DELIVERS</span></div>
+    <div class="tag">Client Insights &middot; Read-Only</div>
+  </div>
+  <button class="menu-btn" onclick="openSettings()">Account</button>
 </header>
 <main>
   <div id="qr-usage-banner"></div>
@@ -47,6 +64,20 @@
   <div class="pull-refresh"><button onclick="loadTable()">↻ Refresh now</button></div>
   <p class="note">Read-only view. Figures refresh automatically every minute and reflect all-time totals since tracking began.</p>
 </main>
+
+<div class="overlay" id="settingsOverlay">
+  <div class="panel">
+    <h3 id="panelTitle">Change Password</h3>
+    <p id="panelSubtitle">Choose a new password for this dashboard.</p>
+    <input type="password" id="newPw" placeholder="New password (min. 6 characters)">
+    <input type="password" id="confirmPw" placeholder="Confirm new password">
+    <button class="primary" onclick="doChangePassword()">Save new password</button>
+    <button class="secondary" id="cancelBtn" onclick="closeSettings()">Cancel</button>
+    <button class="secondary" onclick="window.location.href='/client-logout'">Log out</button>
+    <div class="msg" id="panelMsg"></div>
+  </div>
+</div>
+
 <script src="/qr-banner.js"></script>
 <script>
 async function loadTable(){
@@ -73,6 +104,61 @@ async function loadTable(){
 }
 loadTable();
 setInterval(loadTable, 60000);
+
+function openSettings(forced){
+  document.getElementById('settingsOverlay').classList.add('show');
+  document.getElementById('cancelBtn').style.display = forced ? 'none' : 'block';
+  if (forced) {
+    document.getElementById('panelTitle').textContent = 'Set a new password';
+    document.getElementById('panelSubtitle').textContent = 'Your password was reset by an admin. Choose a new password to continue.';
+  }
+}
+function closeSettings(){
+  document.getElementById('settingsOverlay').classList.remove('show');
+  document.getElementById('newPw').value = '';
+  document.getElementById('confirmPw').value = '';
+  document.getElementById('panelMsg').style.display = 'none';
+}
+async function doChangePassword(){
+  const newPw = document.getElementById('newPw').value;
+  const confirmPw = document.getElementById('confirmPw').value;
+  const msg = document.getElementById('panelMsg');
+  msg.style.display = 'none';
+
+  if (newPw.length < 6) {
+    msg.textContent = 'Password must be at least 6 characters.';
+    msg.className = 'msg err'; msg.style.display = 'block';
+    return;
+  }
+  if (newPw !== confirmPw) {
+    msg.textContent = 'Passwords do not match.';
+    msg.className = 'msg err'; msg.style.display = 'block';
+    return;
+  }
+  try {
+    const res = await fetch('/client-change-password', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({newPassword: newPw})
+    });
+    if (res.ok) {
+      msg.textContent = 'Password updated.';
+      msg.className = 'msg ok'; msg.style.display = 'block';
+      setTimeout(() => { closeSettings(); history.replaceState(null, '', '/client-insights/'); }, 1200);
+    } else {
+      msg.textContent = 'Could not update password. Try logging in again.';
+      msg.className = 'msg err'; msg.style.display = 'block';
+    }
+  } catch(e) {
+    msg.textContent = 'Something went wrong.';
+    msg.className = 'msg err'; msg.style.display = 'block';
+  }
+}
+
+// If the admin reset this password, force the change-password screen immediately, no dismiss.
+if (new URLSearchParams(window.location.search).get('force_reset') === '1') {
+  openSettings(true);
+}
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/client-insights/service-worker.js').catch(()=>{});

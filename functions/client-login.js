@@ -1,10 +1,13 @@
 // functions/client-login.js
-// Handles login for the READ-ONLY client dashboard. Deliberately a separate
-// credential from the admin password (env.CLIENT_DASHBOARD_PASSWORD, not
-// whatever the admin panel uses) so the client never has admin-level access.
+// Handles login for the READ-ONLY client dashboard.
 //
-// Set CLIENT_DASHBOARD_PASSWORD as an environment variable in Cloudflare Pages
-// (Settings -> Environment variables), same way SEED_KEY was set up earlier.
+// Password storage: KV holds a hashed password under "client:password_hash".
+// On first-ever login (before anyone has set a password), it falls back to
+// comparing against env.CLIENT_DASHBOARD_PASSWORD - so that env var is really
+// just the INITIAL password. Once the user changes their password (or admin
+// resets it), KV takes over and the env var is no longer used.
+
+import { hashPassword } from "./_shared/password.js";
 
 export async function onRequestPost(context) {
   const { request, env } = context;
@@ -15,21 +18,28 @@ export async function onRequestPost(context) {
     return json({ error: "Invalid request" }, 400);
   }
 
-  if (!env.CLIENT_DASHBOARD_PASSWORD) {
-    return json({ error: "Dashboard password not configured" }, 500);
+  const kv = env.TD_QR_STATS || env.TD_CACHE;
+  if (!kv) return json({ error: "Storage not configured" }, 500);
+
+  const storedHash = await kv.get("client:password_hash");
+  const mustSetNewPassword = (await kv.get("client:must_reset")) === "true";
+
+  let passwordCorrect = false;
+  if (storedHash) {
+    const submittedHash = await hashPassword(body.password);
+    passwordCorrect = submittedHash === storedHash;
+  } else if (env.CLIENT_DASHBOARD_PASSWORD) {
+    // No password ever set in KV yet - fall back to the initial env var password.
+    passwordCorrect = body.password === env.CLIENT_DASHBOARD_PASSWORD;
   }
 
-  if (body.password !== env.CLIENT_DASHBOARD_PASSWORD) {
+  if (!passwordCorrect) {
     return json({ error: "Incorrect password" }, 401);
   }
 
-  // Simple session token - not a JWT, just a value the middleware checks for.
-  // Good enough for a low-stakes read-only view; if this ever needs to be more
-  // rigorous (e.g. multiple client users with different access), it should be
-  // upgraded to proper signed sessions.
-  const sessionValue = "authenticated-" + Date.now();
+  const sessionValue = "authenticated-" + Date.now() + "-" + Math.random().toString(36).slice(2);
 
-  return new Response(JSON.stringify({ ok: true }), {
+  return new Response(JSON.stringify({ ok: true, mustSetNewPassword }), {
     status: 200,
     headers: {
       "content-type": "application/json",
@@ -41,3 +51,4 @@ export async function onRequestPost(context) {
 function json(body, status) {
   return new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
 }
+
