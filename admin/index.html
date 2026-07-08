@@ -144,6 +144,13 @@ tr:hover td{background:#f8faf8}
       <div class="empty-state" id="emptyState" style="display:none">No applications found.</div>
     </div>
 
+    <h2 style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;color:var(--ink);margin:40px 0 16px 0;">Client Dashboard Access</h2>
+    <div class="table-wrap" style="padding:22px 24px;">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">If the client forgets their Client Insights password, use this to reset it. They'll be logged out everywhere and required to set a brand new password the next time they log in with the original starting password.</p>
+      <button class="action-btn btn-qr" style="padding:10px 20px;font-size:12px;" onclick="resetClientPassword()">Reset Client Password</button>
+      <span id="resetPwStatus" style="margin-left:12px;font-size:12px;font-weight:600;"></span>
+    </div>
+
     <h2 style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;color:var(--ink);margin:40px 0 16px 0;">QR Code Usage</h2>
     <div class="stats-bar">
       <div class="stat-card green">
@@ -300,6 +307,33 @@ async function loadQRStats() {
   }
 }
 setInterval(() => { if (sessionStorage.getItem('td_admin')) loadQRStats(); }, 60000);
+
+// IMPORTANT: this value must match the ADMIN_RESET_KEY environment variable
+// you set in Cloudflare Pages (Settings -> Environment variables). Same
+// pattern as ADMIN_PASS above - if you change one, change the other to match.
+const ADMIN_RESET_KEY = 'abcdef';
+
+async function resetClientPassword() {
+  const status = document.getElementById('resetPwStatus');
+  status.textContent = '';
+  const confirmed = confirm('Reset the client dashboard password? They will be logged out and required to set a new password on their next login.');
+  if (!confirmed) return;
+
+  try {
+    const res = await fetch('/admin-reset-client-password?key=' + encodeURIComponent(ADMIN_RESET_KEY));
+    const data = await res.json();
+    if (res.ok && data.ok) {
+      status.style.color = 'var(--green)';
+      status.textContent = '✓ Password reset. Client must set a new one on next login.';
+    } else {
+      status.style.color = 'var(--red)';
+      status.textContent = '✗ Reset failed: ' + (data.error || 'unknown error');
+    }
+  } catch(e) {
+    status.style.color = 'var(--red)';
+    status.textContent = '✗ Reset failed. Check your connection and try again.';
+  }
+}
 
 function filterApps(filter, btn) {
   currentFilter = filter;
