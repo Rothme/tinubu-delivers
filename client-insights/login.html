@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Tinubu Delivers — Client Insights Login</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+  body{margin:0;font-family:Arial,sans-serif;background:#0d2b1f;display:flex;align-items:center;justify-content:center;height:100vh;}
+  .box{background:#fff;border-radius:12px;padding:36px 32px;width:340px;box-shadow:0 10px 40px rgba(0,0,0,0.3);}
+  h1{font-size:20px;margin:0 0 4px 0;color:#0d2b1f;}
+  p{font-size:13px;color:#777;margin:0 0 22px 0;}
+  input{width:100%;padding:11px 12px;border:1px solid #ccc;border-radius:8px;font-size:15px;box-sizing:border-box;margin-bottom:14px;}
+  button{width:100%;padding:12px;border:none;border-radius:8px;background:#0d5c3a;color:#fff;font-size:15px;font-weight:600;cursor:pointer;}
+  button:hover{background:#0a4a2f;}
+  .err{color:#b00020;font-size:13px;margin-top:10px;display:none;}
+</style>
+</head>
+<body>
+<div class="box">
+  <h1>Client Insights</h1>
+  <p>Read-only usage dashboard — Tinubu Delivers</p>
+  <input type="password" id="pw" placeholder="Password" autofocus>
+  <button onclick="doLogin()">Sign in</button>
+  <div class="err" id="err">Incorrect password.</div>
+</div>
+<script>
+async function doLogin(){
+  const pw = document.getElementById('pw').value;
+  const err = document.getElementById('err');
+  err.style.display = 'none';
+  try {
+    const res = await fetch('/client-login', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({password: pw})
+    });
+    if (res.ok) {
+      window.location.href = '/client-insights/';
+    } else {
+      err.style.display = 'block';
+    }
+  } catch(e) {
+    err.textContent = 'Something went wrong. Try again.';
+    err.style.display = 'block';
+  }
+}
+document.getElementById('pw').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+</script>
+</body>
+</html>
