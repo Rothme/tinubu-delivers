@@ -152,6 +152,35 @@ body{font-family:'DM Sans',sans-serif;background:var(--light);color:var(--text);
 .chg-up{display:inline-block;padding:2px 5px;border-radius:4px;font-size:9px;font-weight:600;background:#e8f5ec;color:#005c38}
 .chg-dn{display:inline-block;padding:2px 5px;border-radius:4px;font-size:9px;font-weight:600;background:#fdecea;color:#c0392b}
 .compare-note{font-size:10px;color:var(--muted);padding:7px 9px;background:#f8faf8;border-top:1px solid var(--border);line-height:1.55;font-style:italic}
+.ig-card{width:1080px;height:1350px;background:linear-gradient(160deg,#f7f8f6 0%,#eef1ec 100%);font-family:Arial,sans-serif;padding:44px 48px;box-sizing:border-box;position:relative;border-radius:28px;overflow:hidden}
+.ig-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px}
+.ig-brand{display:flex;align-items:center;gap:14px}
+.ig-flag{width:60px;height:60px;border-radius:50%;background:#fff;border:3px solid #e0a92e;display:flex;align-items:center;justify-content:center;font-size:30px}
+.ig-brand-name{font-size:30px;font-weight:800;color:#0d5c3a;letter-spacing:.5px}
+.ig-brand-name span{color:#c8952a}
+.ig-brand-tag{font-size:14px;color:#5a6e5a;margin-top:2px}
+.ig-photo{width:260px;height:320px;object-fit:cover;border-radius:20px;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.ig-title-row{display:flex;align-items:center;gap:12px;margin:22px 0 20px 0}
+.ig-pin{font-size:30px}
+.ig-title{font-size:40px;font-weight:800;color:#0d2b1f}
+.ig-subtitle{font-size:18px;color:#c8952a;font-weight:700;margin-top:-2px}
+.ig-hero{background:linear-gradient(135deg,#0d5c3a 0%,#0a3d27 100%);border:3px solid #e0a92e;border-radius:20px;padding:26px 32px;margin-bottom:22px}
+.ig-hero-change{font-size:56px;font-weight:900;color:#f0c14b;line-height:1}
+.ig-hero-label{font-size:20px;color:#fff;font-weight:600;margin-top:6px}
+.ig-hero-arrow{display:inline-block;margin-top:12px;background:rgba(0,0,0,.25);color:#fff;font-size:20px;font-weight:700;padding:8px 16px;border-radius:10px}
+.ig-hero-arrow span{color:#e0a92e}
+.ig-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px}
+.ig-tile{background:#fff;border-radius:16px;padding:18px 16px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.ig-tile-icon{font-size:24px;margin-bottom:8px}
+.ig-tile-value{font-size:26px;font-weight:800;color:#0d2b1f;line-height:1.1}
+.ig-tile-label{font-size:13px;color:#5a6e5a;margin-top:6px;line-height:1.3}
+.ig-tile-verified{background:linear-gradient(135deg,#fdf3dc 0%,#f5e2ae 100%);border:2px solid #e0a92e}
+.ig-achievements{background:#fff;border-radius:16px;padding:22px 26px;margin-bottom:20px;border-left:6px solid #0d5c3a}
+.ig-ach-title{font-size:20px;font-weight:800;color:#0d2b1f;margin-bottom:14px}
+.ig-ach-row{display:flex;align-items:flex-start;gap:10px;font-size:17px;color:#2a3a2a;padding:8px 0;border-bottom:1px dashed #e2e6e0}
+.ig-ach-row:last-child{border-bottom:none}
+.ig-ach-check{background:#0d5c3a;color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.ig-footer{display:flex;justify-content:space-between;align-items:center;background:#0a2118;color:#cfe0d7;border-radius:14px;padding:16px 24px;font-size:14px;position:absolute;bottom:44px;left:48px;right:48px}
 </style>
 </head>
 <body>
@@ -294,7 +323,7 @@ const SECTORS = [
   {id:'housing',name:'Housing & Urban Dev',icon:'🏘️'},
   {id:'transport',name:'Aviation & Transport',icon:'✈️'},
 ];
-let selected=null,cachedPng=null;
+let selected=null,cachedPng=null,currentCardData=null;
 const grid=document.getElementById('sector-grid');
 SECTORS.forEach(s=>{
   const d=document.createElement('div');
@@ -337,6 +366,7 @@ async function startGenerate(){
   }
 }
 function renderInfo(d,s){
+  currentCardData=d;
   document.getElementById('info-icon').textContent=s.icon;
   document.getElementById('info-name').textContent=d.sector;
   document.getElementById('info-tagline').textContent=d.headline;
@@ -355,12 +385,67 @@ function renderInfo(d,s){
   showScreen('info');
   setTimeout(()=>{document.querySelectorAll('.prog-fill').forEach(el=>{el.style.width=el.dataset.w+'%';});},300);
 }
+function igBuildHero(stats){
+  const prevIdx=stats.findIndex(s=>/previous admin/i.test(s.label));
+  const currIdx=stats.findIndex(s=>/current admin/i.test(s.label));
+  const changeIdx=stats.findIndex(s=>/change/i.test(s.label)&&/%/.test(s.value));
+  if(prevIdx!==-1&&currIdx!==-1&&changeIdx!==-1){
+    const hero={type:'trio',change:stats[changeIdx].value,
+      label:(stats[prevIdx].label.replace(/,?\s*previous admin.*/i,'').trim())||'Avg monthly FAAC',
+      from:stats[prevIdx].value,to:stats[currIdx].value};
+    const remaining=stats.filter((_,i)=>i!==prevIdx&&i!==currIdx&&i!==changeIdx);
+    return {hero,remaining};
+  }
+  const [first,...rest]=stats;
+  return {hero:{type:'single',value:first?first.value:'',label:first?first.label:''},remaining:rest};
+}
+function igBuildHTML(d){
+  const isState=!!d.state;
+  const title=isState?d.state:d.sector;
+  const subtitle=isState?d.zone:null;
+  const stats=d.stats||[];
+  const {hero,remaining}=igBuildHero(stats);
+  const tiles=remaining.slice(0,5);
+  const achievements=(d.achievements||[]).slice(0,4);
+  const heroHTML=hero.type==='trio'
+    ?`<div class="ig-hero-change">${hero.change}</div><div class="ig-hero-label">${hero.label}</div><div class="ig-hero-arrow">${hero.from} <span>&#8594;</span> ${hero.to}</div>`
+    :`<div class="ig-hero-change">${hero.value}</div><div class="ig-hero-label">${hero.label}</div>`;
+  const tileIcons=['\u{1F393}','\u{1F4B0}','\u{1F4B3}','\u{1F4C8}','\u{1F3E6}'];
+  const tilesHTML=tiles.map((t,i)=>`<div class="ig-tile"><div class="ig-tile-icon">${tileIcons[i%tileIcons.length]}</div><div class="ig-tile-value">${t.value}</div><div class="ig-tile-label">${t.label}</div></div>`).join('');
+  const verifiedTile=`<div class="ig-tile ig-tile-verified"><div class="ig-tile-icon">&#9989;</div><div class="ig-tile-value" style="font-size:15px;">VERIFIED</div><div class="ig-tile-label">Sourced &middot; Fact-checked</div></div>`;
+  const achHTML=achievements.map(a=>`<div class="ig-ach-row"><span class="ig-ach-check">&#10003;</span><span>${a.title}</span></div>`).join('')
+    ||`<div class="ig-ach-row"><span class="ig-ach-check">&#10003;</span><span>See full record at www.tinubudelivers.com.ng/delivers/</span></div>`;
+  return `<div class="ig-card" id="igCardRoot">
+    <div class="ig-header">
+      <div class="ig-brand">
+        <div class="ig-flag">\u{1F1F3}\u{1F1EC}</div>
+        <div><div class="ig-brand-name">TINUBU <span>DELIVERS</span></div><div class="ig-brand-tag">A citizens' movement &middot; Nigeria 2023-2027</div></div>
+      </div>
+      <img class="ig-photo" src="/assets/president-photo.jpg" crossorigin="anonymous">
+    </div>
+    <div class="ig-title-row"><span class="ig-pin">\u{1F4CD}</span><div><div class="ig-title">${title}</div>${subtitle?`<div class="ig-subtitle">${subtitle}</div>`:''}</div></div>
+    <div class="ig-hero">${heroHTML}</div>
+    <div class="ig-tiles">${tilesHTML}${verifiedTile}</div>
+    <div class="ig-achievements"><div class="ig-ach-title">Key achievements</div>${achHTML}</div>
+    <div class="ig-footer"><span>\u{2705} Verified &middot; Sourced &middot; Fact-checked</span><span>www.tinubudelivers.com.ng/delivers/</span><span>#TinubuDelivers</span></div>
+  </div>`;
+}
 async function capturePng(){
   if(cachedPng)return cachedPng;
-  const card=document.getElementById('infographic-card');
-  card.style.padding='20px';
-  const canvas=await html2canvas(card,{scale:2,useCORS:true,backgroundColor:'#f3f6f0',logging:false});
-  card.style.padding='';cachedPng=canvas.toDataURL('image/png');return cachedPng;
+  if(!currentCardData)throw new Error('No card data to generate an infographic from.');
+  const holder=document.createElement('div');
+  holder.style.position='fixed';holder.style.left='-9999px';holder.style.top='0';
+  holder.innerHTML=igBuildHTML(currentCardData);
+  document.body.appendChild(holder);
+  const img=holder.querySelector('.ig-photo');
+  await new Promise(res=>{if(img.complete)return res();img.onload=res;img.onerror=res;});
+  try{
+    const canvas=await html2canvas(holder.querySelector('#igCardRoot'),{width:1080,height:1350,scale:1,useCORS:true,backgroundColor:'#f4f5f3'});
+    cachedPng=canvas.toDataURL('image/png');
+    return cachedPng;
+  }finally{
+    document.body.removeChild(holder);
+  }
 }
 async function shareImg(platform,btn){
   const orig=btn.innerHTML;btn.disabled=true;btn.innerHTML='⏳';
