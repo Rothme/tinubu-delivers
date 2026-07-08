@@ -128,7 +128,7 @@ tr:hover td{background:#f8faf8}
       <button class="filter-btn" onclick="filterApps('Pending',this)">Pending</button>
       <button class="filter-btn" onclick="filterApps('Approved',this)">Approved</button>
       <button class="filter-btn" onclick="filterApps('Rejected',this)">Rejected</button>
-      <button class="reload-btn" onclick="loadData()">↻ Refresh</button>
+      <button class="reload-btn" onclick="loadData();loadQRStats();">↻ Refresh</button>
     </div>
     <div class="table-wrap">
       <div class="loading-state" id="loadingState">Loading applications…</div>
@@ -142,6 +142,39 @@ tr:hover td{background:#f8faf8}
         <tbody id="appBody"></tbody>
       </table>
       <div class="empty-state" id="emptyState" style="display:none">No applications found.</div>
+    </div>
+
+    <h2 style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;color:var(--ink);margin:40px 0 16px 0;">QR Code Usage</h2>
+    <div class="stats-bar">
+      <div class="stat-card green">
+        <div class="stat-num" id="qrStatTotal">—</div>
+        <div class="stat-lbl">Total Scans (all-time)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="qrStatPct">—</div>
+        <div class="stat-lbl">Of 50,000,000 Cap</div>
+      </div>
+      <div class="stat-card" id="qrAlertCard">
+        <div class="stat-num" id="qrStatAlert">—</div>
+        <div class="stat-lbl">40M Alert Status</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="qrStatCodes">—</div>
+        <div class="stat-lbl">Distinct QR Codes</div>
+      </div>
+    </div>
+    <div id="qrAlertBanner" style="display:none;background:var(--red);color:#fff;padding:12px 18px;border-radius:8px;font-size:13px;font-weight:600;margin-bottom:20px;">
+      ⚠ Usage has crossed 40,000,000 scans. Reach out to the client to discuss the contract cap.
+    </div>
+    <div class="table-wrap">
+      <div class="loading-state" id="qrLoadingState">Loading QR usage…</div>
+      <table id="qrTable" style="display:none">
+        <thead>
+          <tr><th>Label / Tag</th><th>Scans</th><th>First Seen</th><th>Last Seen</th></tr>
+        </thead>
+        <tbody id="qrTableBody"></tbody>
+      </table>
+      <div class="empty-state" id="qrEmptyState" style="display:none">No QR scans recorded yet.</div>
     </div>
   </div>
 </div>
@@ -177,6 +210,7 @@ function doLogin() {
     document.getElementById('loginWrap').style.display = 'none';
     document.getElementById('adminWrap').classList.add('visible');
     loadData();
+    loadQRStats();
   } else {
     document.getElementById('loginErr').textContent = 'Invalid credentials.';
   }
@@ -191,6 +225,7 @@ if (sessionStorage.getItem('td_admin')) {
   document.getElementById('loginWrap').style.display = 'none';
   document.getElementById('adminWrap').classList.add('visible');
   loadData();
+  loadQRStats();
 }
 
 async function loadData() {
@@ -221,6 +256,50 @@ function updateStats() {
   document.getElementById('statRejected').textContent = allApps.filter(a => a.status === 'Rejected').length;
   document.getElementById('statTotal').textContent    = allApps.length;
 }
+
+async function loadQRStats() {
+  document.getElementById('qrLoadingState').style.display = 'block';
+  document.getElementById('qrTable').style.display = 'none';
+  document.getElementById('qrEmptyState').style.display = 'none';
+  try {
+    const res = await fetch('/qr-stats');
+    const data = await res.json();
+
+    document.getElementById('qrStatTotal').textContent = data.total.toLocaleString();
+    document.getElementById('qrStatPct').textContent = data.percentOfCap + '%';
+    document.getElementById('qrStatCodes').textContent = (data.tags || []).length;
+
+    const alertCard = document.getElementById('qrAlertCard');
+    const alertStat = document.getElementById('qrStatAlert');
+    const alertBanner = document.getElementById('qrAlertBanner');
+    if (data.alertActive) {
+      alertStat.textContent = 'ALERT';
+      alertCard.classList.add('red');
+      alertBanner.style.display = 'block';
+    } else {
+      alertStat.textContent = 'Normal';
+      alertCard.classList.add('green');
+      alertBanner.style.display = 'none';
+    }
+
+    document.getElementById('qrLoadingState').style.display = 'none';
+    if (!data.tags || data.tags.length === 0) {
+      document.getElementById('qrEmptyState').style.display = 'block';
+      return;
+    }
+    document.getElementById('qrTable').style.display = 'table';
+    document.getElementById('qrTableBody').innerHTML = data.tags.map(t => `
+      <tr>
+        <td><span class="badge badge-approved">${esc(t.tag)}</span></td>
+        <td style="font-weight:600">${t.count.toLocaleString()}</td>
+        <td class="td-meta">${new Date(t.firstSeen).toLocaleDateString()}</td>
+        <td class="td-meta">${new Date(t.lastSeen).toLocaleDateString()}</td>
+      </tr>`).join('');
+  } catch(e) {
+    document.getElementById('qrLoadingState').textContent = 'Failed to load QR usage data.';
+  }
+}
+setInterval(() => { if (sessionStorage.getItem('td_admin')) loadQRStats(); }, 60000);
 
 function filterApps(filter, btn) {
   currentFilter = filter;
