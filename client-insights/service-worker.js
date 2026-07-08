@@ -1,16 +1,18 @@
 // client-insights/service-worker.js
-// Minimal, conservative service worker - just enough to make the app
-// installable. It ONLY ever touches the exact shell files listed below.
-// Every other request (POST logins, /qr-stats, images, anything else) is
-// passed straight through to the network untouched - the fetch handler
-// does nothing at all for those, which is the safest possible behavior.
-//
-// CACHE_NAME is versioned - bump this number any time shell files change,
-// so browsers with an old worker installed pick up the new one instead of
-// silently keeping stale cached content.
+// Deliberately minimal. Earlier versions tried to cache login.html itself as
+// part of an "app shell" - that triggers a real browser restriction: you
+// cannot serve a cached response for a page navigation if that response was
+// ever the result of a redirect ("a redirected response was used for a
+// request whose redirect mode is not 'follow'"). Rather than fight that,
+// this version never touches HTML pages or navigations at all. It only
+// caches the manifest and icon - small static files that are never subject
+// to that restriction - which is already enough to satisfy "installable as
+// an app" requirements. Every page load (login, dashboard) always goes
+// straight to the network, every time, with zero risk of serving something
+// stale or broken.
 
-const CACHE_NAME = "td-insights-shell-v2";
-const SHELL_FILES = ["/client-insights/login.html", "/client-insights/manifest.json"];
+const CACHE_NAME = "td-insights-shell-v3";
+const SHELL_FILES = ["/client-insights/manifest.json", "/client-insights/icon-192.png"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -31,9 +33,8 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
-  // Only ever intercept GET requests for the exact shell files. Everything
-  // else - POST requests, /qr-stats, images, the dashboard page itself -
-  // is left completely alone and goes straight to the network as normal.
+  // Never touch navigation requests (loading a page/HTML) - always network.
+  if (event.request.mode === "navigate") return;
   if (event.request.method !== "GET") return;
 
   const path = new URL(event.request.url).pathname;
@@ -43,4 +44,5 @@ self.addEventListener("fetch", (event) => {
     caches.match(event.request).then((cached) => cached || fetch(event.request))
   );
 });
+
 
