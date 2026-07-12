@@ -417,7 +417,7 @@ function showQR(orgName, refCode) {
   const canvas = document.getElementById('qrCanvas');
   canvas.innerHTML = '';
   new QRCode(canvas, {
-    text: BASE_URL + '?ref=' + encodeURIComponent(refCode),
+    text: location.origin + '/track-qr?tag=' + encodeURIComponent(refCode),
     width: 240, height: 240,
     colorDark: '#008751', colorLight: '#ffffff',
     correctLevel: QRCode.CorrectLevel.H
