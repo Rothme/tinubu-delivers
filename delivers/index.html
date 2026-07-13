@@ -192,6 +192,17 @@ body{font-family:'DM Sans',sans-serif;background:var(--light);color:var(--text);
 .ig-footer-verified-text span{font-size:10px;color:#cfe0d7;letter-spacing:.03em}
 .ig-footer-url{font-size:13px;color:#cfe0d7}
 .ig-footer-tag{font-size:13px;font-weight:700;color:#fff}
+.ig-hero-icon svg{width:32px;height:32px}
+.ig-tile-icon svg{width:22px;height:22px}
+.ig-ach-check svg{width:12px;height:12px}
+.ig-footer-seal svg{width:18px;height:18px}
+.ig-hero-icon{color:#fff}
+.ig-tile-icon{color:#0d5c3a}
+.ig-tile-verified .ig-tile-icon{color:#fff}
+.ig-ach-check{color:#fff}
+.ig-footer-seal{color:#0a2118}
+.ig-tile-rule{height:1px;background:#e0e8da;margin:8px 0 6px}
+.ig-tile-caption{font-size:9.5px;color:#8a988a;text-transform:uppercase;letter-spacing:.03em}
 </style>
 </head>
 <body>
@@ -415,7 +426,15 @@ const sectorIcons={
   'Education':'🎓','Security':'🛡️','Infrastructure':'🏗️','Transportation':'🚆',
   'Housing':'🏘️','Digital Economy':'💻','Foreign Affairs':'🌍','Youth & Sports':'⚽'
 };
-
+const ICONS={
+  trendUp:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,17 9,11 13,15 21,6"/><polyline points="15,6 21,6 21,12"/></svg>',
+  cap:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3 1 8l11 5 9-4.09V17h2V8L12 3zM5 10.18v4.32c0 2 3.5 3.5 7 3.5s7-1.5 7-3.5v-4.32l-7 3.18-7-3.18z"/></svg>',
+  moneyBag:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 2h6l1.5 3.5c2.5 1 4 3.7 4 6.8 0 4.6-4 8.2-8.5 8.2S3.5 17 3.5 12.3c0-3.1 1.5-5.8 4-6.8L9 2zm3 6a3 3 0 100 6 3 3 0 000-6z"/></svg>',
+  coins:'<svg viewBox="0 0 24 24" fill="currentColor"><ellipse cx="8" cy="8" rx="6" ry="3.5"/><path d="M2 8v5c0 1.9 2.7 3.5 6 3.5s6-1.6 6-3.5V8"/><ellipse cx="16" cy="14" rx="6" ry="3.5" opacity=".55"/><path d="M10 14v3c0 1.9 2.7 3.5 6 3.5s6-1.6 6-3.5v-3" opacity=".55"/></svg>',
+  shieldCheck:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.4 8.7 8 10 4.6-1.3 8-5 8-10V5l-8-3z"/><path d="M9 12l2 2 4-4"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,12 9,17 20,6"/></svg>',
+  globe:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 4 5.7 4 9s-1.5 6.5-4 9c-2.5-2.5-4-5.7-4-9s1.5-6.5 4-9z"/></svg>'
+};
 function igBuildHTML(d){
   const isState=!!d.state;
   const title=isState?d.state:d.sector;
@@ -425,11 +444,11 @@ function igBuildHTML(d){
   const tiles=remaining.slice(0,4);
   const allAchievements=d.achievements||[];
   const achievements=allAchievements.slice(0,4);
-  const tileIcons=['🎓','💰','💳','📈'];
+  const tileIconSet=[ICONS.cap,ICONS.moneyBag,ICONS.coins,ICONS.trendUp];
   const heroArrowHTML=hero.type==='trio'
     ?`<div class="ig-hero-arrow">(<b>${hero.from}</b> &#8594; <b>${hero.to}</b>)</div>`:'';
   const heroHTML=`
-    <div class="ig-hero-icon">📈</div>
+    <div class="ig-hero-icon">${ICONS.trendUp}</div>
     <div>
       <div class="ig-hero-change">${hero.type==='trio'?hero.change:hero.value}</div>
       <div class="ig-hero-label">${hero.label}</div>
@@ -437,19 +456,20 @@ function igBuildHTML(d){
     </div>`;
   const tilesHTML=tiles.map((t,i)=>`
     <div class="ig-tile">
-      <div class="ig-tile-icon">${tileIcons[i%tileIcons.length]}</div>
+      <div class="ig-tile-icon">${tileIconSet[i%tileIconSet.length]}</div>
       <div class="ig-tile-value">${t.value}</div>
       <div class="ig-tile-label">${t.label}</div>
+      ${t.caption?`<div class="ig-tile-rule"></div><div class="ig-tile-caption">${t.caption}</div>`:''}
     </div>`).join('');
   const verifiedTile=`
     <div class="ig-tile ig-tile-verified">
-      <div class="ig-tile-icon">&#9989;</div>
+      <div class="ig-tile-icon">${ICONS.shieldCheck}</div>
       <div class="ig-tile-value">${allAchievements.length}</div>
       <div class="ig-tile-label">Verified achievements on record</div>
     </div>`;
   const achHTML=achievements.map(a=>`
-    <div class="ig-ach-row"><span class="ig-ach-check">&#10003;</span><span>${a.title}</span></div>`).join('')
-    ||`<div class="ig-ach-row"><span class="ig-ach-check">&#10003;</span><span>See full record at tinubudelivers.com.ng</span></div>`;
+    <div class="ig-ach-row"><span class="ig-ach-check">${ICONS.check}</span><span>${a.title}</span></div>`).join('')
+    ||`<div class="ig-ach-row"><span class="ig-ach-check">${ICONS.check}</span><span>See full record at tinubudelivers.com.ng</span></div>`;
   const sideIcon=isState?'📍':(sectorIcons[title]||'📊');
   return `<div class="ig-card" id="igCardRoot">
     <div class="ig-photo-wrap"><img class="ig-photo" src="/assets/president-photo.jpg" crossorigin="anonymous"></div>
@@ -475,10 +495,10 @@ function igBuildHTML(d){
     </div>
     <div class="ig-footer">
       <div class="ig-footer-verified">
-        <div class="ig-footer-seal">✓</div>
+        <div class="ig-footer-seal">${ICONS.check}</div>
         <div class="ig-footer-verified-text"><b>VERIFIED</b><span>SOURCED &middot; FACT-CHECKED</span></div>
       </div>
-      <div class="ig-footer-url">🌐 tinubudelivers.com.ng</div>
+      <div class="ig-footer-url">${ICONS.globe} tinubudelivers.com.ng</div>
       <div class="ig-footer-tag">#TinubuDelivers</div>
     </div>
   </div>`;
